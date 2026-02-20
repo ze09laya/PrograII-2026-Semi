@@ -6,6 +6,8 @@
         <item>Volumen</item>
         <item>Masa</item>
         <item>Almacenamiento</item>
+        <item>Tiempo</item>
+        <item>Transferencia de Datos</item>
     </string-array>
 </resources>
 
