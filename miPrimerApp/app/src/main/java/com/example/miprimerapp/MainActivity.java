@@ -1,87 +1,154 @@
 package com.example.miprimerapp;
 
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.Spinner;
-import android.widget.TextView;
-
-
-import android.graphics.Color;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-
-import androidx.activity.EdgeToEdge;
-
+import android.widget.*;
+import android.view.View;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView tempVal;
-    SensorManager sensorManager;
-    Sensor sensor;
-    SensorEventListener sensorEventListener;
+    TextView txtCantidad, lblRespuesta;
+    Spinner spnDe, spnA;
+    Button btnConvertir;
 
-    @Override
-    protected void onPause() {
-        detener();
-        super.onPause();
-    }
 
-    @Override
-    protected void onResume() {
-        iniciar();
-        super.onResume();
-    }
+    Double valores[][] = {
+
+            {1.0, 10.7639, 1.43082, 1.19599, 0.002289, 0.00014308, 1e-4}
+    };
+
+    String[][] etiquetas = {
+            {"Metro Cuadrado", "Pie Cuadrado", "Vara Cuadrada", "Yarda Cuadrada", "Tarea", "Manzana", "Hectárea"}
+    };
+
+
+    EditText etMetros;
+    Button btnCalcular;
+    TextView tvResultadoAgua;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        sensorAcelerometro();
-    }
-    private void iniciar(){
-        sensorManager.registerListener(sensorEventListener, sensor, 2000*1000);
-    }
-    private void detener(){
-        sensorManager.unregisterListener(sensorEventListener);
+        configurarTabs();
+        configurarAgua();
+        configurarConversor();
     }
 
-    private void sensorAcelerometro(){
-        tempVal = findViewById(R.id.lblSensorAcelerometro);
-        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
-        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        if(sensor==null){
+    private void configurarTabs() {
 
+        TabHost tabHost = findViewById(android.R.id.tabhost);
+        tabHost.setup();
 
-            tempVal.setText("No dispones del sensor de acelerometro");
-            finish();
+        TabHost.TabSpec spec;
+
+        spec = tabHost.newTabSpec("Tab1");
+        spec.setContent(R.id.tab1);
+        spec.setIndicator("AGUA");
+        tabHost.addTab(spec);
+
+        spec = tabHost.newTabSpec("Tab2");
+        spec.setContent(R.id.tab2);
+        spec.setIndicator("CONVERSOR");
+        tabHost.addTab(spec);
+    }
+
+    private void configurarAgua() {
+
+        etMetros = findViewById(R.id.etMetros);
+        btnCalcular = findViewById(R.id.btnCalcular);
+        tvResultadoAgua = findViewById(R.id.tvResultado);
+
+        btnCalcular.setOnClickListener(v -> {
+
+            String texto = etMetros.getText().toString();
+
+            if (texto.isEmpty()) {
+                Toast.makeText(this, "Ingresa los metros consumidos", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            double metros;
+
+            try {
+                metros = Double.parseDouble(texto);
+            } catch (Exception e) {
+                Toast.makeText(this, "Número inválido", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            double total;
+
+            if (metros <= 18) {
+                total = 6.0;
+            } else if (metros <= 28) {
+                total = 6 + ((metros - 18) * 0.45);
+            } else {
+                double tramo1 = 10 * 0.45;
+                double tramo2 = (metros - 28) * 0.65;
+                total = 6 + tramo1 + tramo2;
+            }
+
+            tvResultadoAgua.setText("RESULTADO: $" + String.format("%.2f", total));
+            Toast.makeText(this, "Cálculo realizado", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    private void configurarConversor() {
+
+        btnConvertir = findViewById(R.id.btnConvertir);
+        spnDe = findViewById(R.id.spnDe);
+        spnA = findViewById(R.id.spnA);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                etiquetas[0]
+        );
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spnDe.setAdapter(adapter);
+        spnA.setAdapter(adapter);
+
+        btnConvertir.setOnClickListener(v -> convertir());
+    }
+
+    private void convertir() {
+
+        txtCantidad = findViewById(R.id.etArea);
+        String texto = txtCantidad.getText().toString();
+
+        if (texto.isEmpty()) {
+            Toast.makeText(this, "Ingresa una cantidad", Toast.LENGTH_SHORT).show();
+            return;
         }
-        sensorEventListener = new SensorEventListener() {
-            @Override
-            public void onSensorChanged(SensorEvent sensorEvent) {
 
+        double cantidad;
 
-                double x = sensorEvent.values[0];
-                double y = sensorEvent.values[1];
-                double z = sensorEvent.values[2];
-                tempVal.setText("Desplazamiento: X: "+ x +"\n; Y: "+y +"\n; Z: "+z);
+        try {
+            cantidad = Double.parseDouble(texto);
+        } catch (Exception e) {
+            Toast.makeText(this, "Número inválido", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-            }
-            @Override
-            public void onAccuracyChanged(Sensor sensor, int i) {
+        int de = spnDe.getSelectedItemPosition();
+        int a = spnA.getSelectedItemPosition();
 
-            }
-        };
+        double respuesta = conversor(de, a, cantidad);
+
+        lblRespuesta = findViewById(R.id.tvResultadoArea);
+        lblRespuesta.setText("RESULTADO: " + respuesta);
+
+        Toast.makeText(this, "Conversión realizada", Toast.LENGTH_SHORT).show();
+    }
+
+    private double conversor(int de, int a, double cantidad) {
+
+        return valores[0][a] / valores[0][de] * cantidad;
     }
 }
-
