@@ -1,12 +1,3 @@
 <resources>
-    <string name="app_name">Conversores</string>
-    <string-array name="unidades_area">
-        <item>Pie Cuadrado</item>
-        <item>Vara Cuadrada</item>
-        <item>Yarda Cuadrada</item>
-        <item>Metro Cuadrado</item>
-        <item>Tarea</item>
-        <item>Manzana</item>
-        <item>Hectárea</item>
-    </string-array>
+
 </resources>
