@@ -18,6 +18,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import android.app.Activity;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
 
@@ -34,7 +35,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     DB db;
     Button btn;
