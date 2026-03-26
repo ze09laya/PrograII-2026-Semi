@@ -1,85 +1,94 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@android:id/tabhost"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
     <EditText
-        android:id="@+id/txtNombreAmigos"
-        android:hint="Nombre"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
+        android:id="@+id/txtcodigoAmigos"
+        android:hint="Código"
+        android:textColor="@color/white"
+        android:textColorHint="@color/grayText"
+        android:backgroundTint="@color/accent"
+        android:layout_margin="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
     <EditText
-        android:id="@+id/txtDireccionAmigos"
+        android:id="@+id/txtdescripcionAmigos"
+        android:hint="Descripción"
+        android:textColor="@color/white"
+        android:textColorHint="@color/grayText"
+        android:backgroundTint="@color/accent"
+        android:layout_below="@id/txtcodigoAmigos"
+        android:layout_margin="20dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txtNombreAmigos"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="20dp"
-        android:hint="Direccion" />
+        android:layout_height="wrap_content"/>
 
     <EditText
-        android:id="@+id/txtTelefonoAmigos"
+        android:id="@+id/txtmarcaAmigos"
+        android:hint="Marca"
+        android:textColor="@color/white"
+        android:textColorHint="@color/grayText"
+        android:backgroundTint="@color/accent"
+        android:layout_below="@id/txtdescripcionAmigos"
+        android:layout_margin="20dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txtDireccionAmigos"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="20dp"
-        android:hint="Telefono" />
+        android:layout_height="wrap_content"/>
 
     <EditText
-        android:id="@+id/txtEmailAmigos"
+        android:id="@+id/txtpresentacionAmigos"
+        android:hint="Presentación"
+        android:textColor="@color/white"
+        android:textColorHint="@color/grayText"
+        android:backgroundTint="@color/accent"
+        android:layout_below="@id/txtmarcaAmigos"
+        android:layout_margin="20dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txtTelefonoAmigos"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="20dp"
-        android:hint="Email" />
+        android:layout_height="wrap_content"/>
 
     <EditText
-        android:id="@+id/txtDuiAmigos"
+        android:id="@+id/txtprecioAmigos"
+        android:hint="Precio"
+        android:inputType="numberDecimal"
+        android:textColor="@color/white"
+        android:textColorHint="@color/grayText"
+        android:backgroundTint="@color/accent"
+        android:layout_below="@id/txtpresentacionAmigos"
+        android:layout_margin="20dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txtEmailAmigos"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="20dp"
-        android:hint="DUI" />
+        android:layout_height="wrap_content"/>
 
     <ImageButton
         android:id="@+id/imgFotoAmigo"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_below="@id/txtprecioAmigos"
         android:layout_centerHorizontal="true"
-        android:layout_below="@+id/txtDuiAmigos"
         android:layout_marginTop="20dp"
         android:src="@drawable/camara"
-        android:layout_width="100dp"
-        android:layout_height="100dp"/>
+        android:background="@color/darkGray"
+        android:scaleType="centerCrop"/>
 
     <Button
         android:id="@+id/btnGuardarAmigo"
-        android:text="Guardar Amigo"
-        android:layout_below="@+id/imgFotoAmigo"
-        android:layout_marginTop="20dp"
+        android:text="Guardar Producto"
+        android:textColor="@color/black"
+        android:backgroundTint="@color/accent"
+        android:layout_below="@id/imgFotoAmigo"
+        android:layout_margin="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabListaAmigo"
-        android:src="@drawable/undo"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_margin="20dp"
+        android:src="@android:drawable/ic_media_previous"
+        app:backgroundTint="@color/accent"
+        android:tint="@color/black"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
+
 </RelativeLayout>
-
-
-

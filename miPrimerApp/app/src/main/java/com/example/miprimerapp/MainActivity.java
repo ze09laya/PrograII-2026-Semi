@@ -1,34 +1,24 @@
 package com.example.miprimerapp;
 
+import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Bundle;
-import android.widget.*;
-import android.view.View;
-import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;import android.content.Intent;
-import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import android.app.Activity;
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
-
-import androidx.activity.EdgeToEdge;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -39,136 +29,248 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class MainActivity extends Activity {
+
     DB db;
-    Button btn;
+    Button btnGuardar;
     TextView tempVal;
-    String accion="nuevo", idAmigo="", urlFoto;
-    Intent tomarFotoIntent;
-    FloatingActionButton fab;
-    ImageView img;
+    String accion = "nuevo", idProducto = "", urlFoto;
+    FloatingActionButton fabLista;
+    ImageView imgFoto;
+
+    private static final int PERMISSIONS_CODE = 100;
+    private static final int CAMERA_CODE = 1;
+    private static final int GALERIA_CODE = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        img = findViewById(R.id.imgFotoAmigo);
-        img.setOnClickListener(v->tomarFoto());
-
         db = new DB(this);
 
-        btn = findViewById(R.id.btnGuardarAmigo);
-        btn.setOnClickListener(v->guardarAmigo());
+        imgFoto = findViewById(R.id.imgFotoAmigo);
+        imgFoto.setOnClickListener(v -> mostrarOpcionesFoto());
 
-        fab = findViewById(R.id.fabListaAmigo);
-        fab.setOnClickListener(v->regresarListaAmigos());
+        btnGuardar = findViewById(R.id.btnGuardarAmigo);
+        btnGuardar.setOnClickListener(v -> guardarProductoConValidacion());
 
-        mostrarDatosAmigos();
+        fabLista = findViewById(R.id.fabListaAmigo);
+        fabLista.setOnClickListener(v -> regresarLista());
+
+        pedirPermisos();
+        mostrarDatosProducto();
     }
-    private void mostrarDatosAmigos(){
-        try{
-            Bundle parametros = getIntent().getExtras();
-            accion = parametros.getString("accion");
-            if(accion.equals("modificar")){
-                JSONObject datos = new JSONObject(parametros.getString("amigos"));
-                idAmigo = datos.getString("idAmigo");
 
-                tempVal = findViewById(R.id.txtNombreAmigos);
-                tempVal.setText(datos.getString("nombre"));
+    private void pedirPermisos() {
+        String[] permisos = {Manifest.permission.CAMERA,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.READ_MEDIA_IMAGES};
 
-                tempVal = findViewById(R.id.txtDireccionAmigos);
-                tempVal.setText(datos.getString("direccion"));
-
-                tempVal = findViewById(R.id.txtTelefonoAmigos);
-                tempVal.setText(datos.getString("telefono"));
-
-                tempVal = findViewById(R.id.txtEmailAmigos);
-                tempVal.setText(datos.getString("email"));
-
-                tempVal = findViewById(R.id.txtDuiAmigos);
-                tempVal.setText(datos.getString("dui"));
-
-                urlFoto = datos.getString("foto");
-                img.setImageURI(Uri.parse(urlFoto));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            boolean faltan = false;
+            for (String p : permisos) {
+                if (checkSelfPermission(p) != PackageManager.PERMISSION_GRANTED) {
+                    faltan = true;
+                    break;
+                }
             }
-        }catch (Exception e){
-            mostrarMsg("Error al mostrar los datos: "+ e.getMessage());
+            if (faltan) requestPermissions(permisos, PERMISSIONS_CODE);
         }
     }
-    private void tomarFoto(){
-        tomarFotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File fotoAmigo = null;
 
-        try{
-            fotoAmigo = crearImgAmigo();
-            if(fotoAmigo!=null){
-                Uri uriFoto = FileProvider.getUriForFile(MainActivity.this, "com.ugb.miprimeraapp.fileprovider", fotoAmigo);
-                tomarFotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriFoto);
-                startActivityForResult(tomarFotoIntent, 1);
-            }else{
-                mostrarMsg("Nose pudo crear la foto");
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSIONS_CODE) {
+            boolean todosAceptados = true;
+            for (int r : grantResults) if (r != PackageManager.PERMISSION_GRANTED) todosAceptados = false;
+            if (!todosAceptados)
+                Toast.makeText(this, "Permisos requeridos para usar la cámara y galería", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void mostrarDatosProducto() {
+        try {
+            Bundle parametros = getIntent().getExtras();
+            if (parametros != null) {
+                accion = parametros.getString("accion", "nuevo");
+                if (accion.equals("modificar")) {
+                    JSONObject datos = new JSONObject(parametros.getString("amigos"));
+                    idProducto = datos.getString("idAmigo");
+
+                    tempVal = findViewById(R.id.txtcodigoAmigos);
+                    tempVal.setText(datos.getString("codigo"));
+
+                    tempVal = findViewById(R.id.txtdescripcionAmigos);
+                    tempVal.setText(datos.getString("descripcion"));
+
+                    tempVal = findViewById(R.id.txtmarcaAmigos);
+                    tempVal.setText(datos.getString("marca"));
+
+                    tempVal = findViewById(R.id.txtpresentacionAmigos);
+                    tempVal.setText(datos.getString("presentacion"));
+
+                    tempVal = findViewById(R.id.txtprecioAmigos);
+                    tempVal.setText(datos.getString("precio"));
+
+                    urlFoto = datos.getString("foto");
+                    if (!urlFoto.isEmpty()) imgFoto.setImageBitmap(BitmapFactory.decodeFile(urlFoto));
+                }
             }
         } catch (Exception e) {
-            mostrarMsg("Error al tomar la foto: "+ e.getMessage());
+            Toast.makeText(this, "Error al mostrar datos: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
+    }
+
+    // 📸 Opciones foto: Cámara o Galería
+    private void mostrarOpcionesFoto() {
+        String[] opciones = {"Tomar foto", "Elegir de galería"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Selecciona una opción");
+        builder.setItems(opciones, (dialog, which) -> {
+            if (which == 0) abrirCamara();
+            if (which == 1) abrirGaleria();
+        });
+        builder.show();
+    }
+
+    private void abrirCamara() {
+        Intent tomarFotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        File fotoArchivo = null;
+
+        try {
+            fotoArchivo = crearArchivoFoto();
+            if (fotoArchivo != null) {
+                Uri uriFoto = FileProvider.getUriForFile(
+                        this,
+                        getApplicationContext().getPackageName() + ".fileprovider",
+                        fotoArchivo
+                );
+                tomarFotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriFoto);
+                startActivityForResult(tomarFotoIntent, CAMERA_CODE);
+            } else {
+                Toast.makeText(this, "No se pudo crear archivo foto", Toast.LENGTH_LONG).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Error abrir cámara: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private File crearArchivoFoto() throws Exception {
+        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String nombreArchivo = "foto_" + timestamp;
+        File dirAlmacenamiento = getExternalFilesDir(Environment.DIRECTORY_DCIM);
+        if (!dirAlmacenamiento.exists()) dirAlmacenamiento.mkdir();
+        File imagen = File.createTempFile(nombreArchivo, ".jpg", dirAlmacenamiento);
+        urlFoto = imagen.getAbsolutePath();
+        return imagen;
+    }
+
+    private void abrirGaleria() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, GALERIA_CODE);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        try{
-            if(requestCode==1 && resultCode==RESULT_OK){
-                img.setImageURI(Uri.parse(urlFoto));
-            }else{
-                mostrarMsg("No fue posible mostrar la foto");
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == CAMERA_CODE) {
+                imgFoto.setImageBitmap(BitmapFactory.decodeFile(urlFoto));
+            } else if (requestCode == GALERIA_CODE) {
+                if (data != null && data.getData() != null) {
+                    Uri selectedImage = data.getData();
+                    imgFoto.setImageURI(selectedImage);
+                    urlFoto = getRealPathFromURI(selectedImage);
+                }
+            }
+        } else {
+            Toast.makeText(this, "No se seleccionó ninguna imagen", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private String getRealPathFromURI(Uri uri) {
+        String path = "";
+        Cursor cursor = null;
+        try {
+            String[] proj = {MediaStore.Images.Media.DATA};
+            cursor = getContentResolver().query(uri, proj, null, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                path = cursor.getString(column_index);
             }
         } catch (Exception e) {
-            mostrarMsg("Error en abrir la camara: "+ e.getMessage());
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) cursor.close();
         }
+        return path;
     }
 
-    private File crearImgAmigo() throws Exception{
-        String fechaHoraMs = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()),
-                fileMane = "foto_"+ fechaHoraMs;
-        File dirAlmacenamiento = getExternalFilesDir(Environment.DIRECTORY_DCIM);
-        if(dirAlmacenamiento.exists()==false){
-            dirAlmacenamiento.mkdir();
+    // 🔹 Guardar producto con validación
+    private void guardarProductoConValidacion() {
+        tempVal = findViewById(R.id.txtcodigoAmigos);
+        String codigo = tempVal.getText().toString().trim();
+
+        tempVal = findViewById(R.id.txtdescripcionAmigos);
+        String descripcion = tempVal.getText().toString().trim();
+
+        tempVal = findViewById(R.id.txtmarcaAmigos);
+        String marca = tempVal.getText().toString().trim();
+
+        tempVal = findViewById(R.id.txtpresentacionAmigos);
+        String presentacion = tempVal.getText().toString().trim();
+
+        tempVal = findViewById(R.id.txtprecioAmigos);
+        String precio = tempVal.getText().toString().trim();
+
+        // ✅ Validación de campos
+        if (codigo.isEmpty()) {
+            tempVal.requestFocus();
+            tempVal.setError("Ingrese el código");
+            return;
         }
-        File image = File.createTempFile(fileMane, ".jpg", dirAlmacenamiento);
-        urlFoto = image.getAbsolutePath();
-        return image;
-    }
-    private void guardarAmigo(){
-        tempVal = findViewById(R.id.txtNombreAmigos);
-        String nombre = tempVal.getText().toString();
+        if (descripcion.isEmpty()) {
+            tempVal = findViewById(R.id.txtdescripcionAmigos);
+            tempVal.requestFocus();
+            tempVal.setError("Ingrese la descripción");
+            return;
+        }
+        if (marca.isEmpty()) {
+            tempVal = findViewById(R.id.txtmarcaAmigos);
+            tempVal.requestFocus();
+            tempVal.setError("Ingrese la marca");
+            return;
+        }
+        if (presentacion.isEmpty()) {
+            tempVal = findViewById(R.id.txtpresentacionAmigos);
+            tempVal.requestFocus();
+            tempVal.setError("Ingrese la presentación");
+            return;
+        }
+        if (precio.isEmpty()) {
+            tempVal = findViewById(R.id.txtprecioAmigos);
+            tempVal.requestFocus();
+            tempVal.setError("Ingrese el precio");
+            return;
+        }
+        if (urlFoto == null || urlFoto.isEmpty()) {
+            Toast.makeText(this, "Seleccione una imagen para el producto", Toast.LENGTH_LONG).show();
+            return;
+        }
 
-        tempVal = findViewById(R.id.txtDireccionAmigos);
-        String direccion = tempVal.getText().toString();
-
-        tempVal = findViewById(R.id.txtTelefonoAmigos);
-        String tel = tempVal.getText().toString();
-
-        tempVal = findViewById(R.id.txtEmailAmigos);
-        String email = tempVal.getText().toString();
-
-        tempVal = findViewById(R.id.txtDuiAmigos);
-        String dui = tempVal.getText().toString();
-
-        String[] datos = {idAmigo, nombre, direccion, tel, email, dui, urlFoto};
+        String[] datos = {idProducto, codigo, descripcion, marca, presentacion, precio, urlFoto};
         db.administrar_amigos(accion, datos);
-        mostrarMsg("Registro de amigo guardado con exito.");
+        Toast.makeText(this, "Producto guardado con éxito", Toast.LENGTH_LONG).show();
 
-        regresarListaAmigos();
+        regresarLista();
     }
-    private void mostrarMsg(String msg){
-        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-    }
-    private void regresarListaAmigos(){
-        Intent intent = new Intent(this, lista_amigos.class);
+
+    private void regresarLista() {
+        Intent intent = new Intent(this, lista_producto.class);
         startActivity(intent);
+        finish();
     }
 }
-
-
-
-
