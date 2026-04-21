@@ -8,35 +8,80 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-public class obtenerDatosServidor extends AsyncTask<String, String, String>{
+
+public class obtenerDatosServidor extends AsyncTask<String, String, String> {
+
     HttpURLConnection httpURLConnection;
-    @Override
-    protected void onPostExecute(String s) {
-        super.onPostExecute(s);
-    }
 
     @Override
     protected String doInBackground(String... strings) {
+
         StringBuilder respuesta = new StringBuilder();
-        try{
+
+        try {
+
             URL url = new URL(utilidades.url_consulta);
+
             httpURLConnection = (HttpURLConnection) url.openConnection();
             httpURLConnection.setRequestMethod("GET");
-            httpURLConnection.setRequestProperty("Authorization", "Basic "+utilidades.credencialesCodificadas);
 
-            InputStream inputStream = new BufferedInputStream(httpURLConnection.getInputStream());
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            httpURLConnection.setConnectTimeout(10000);
+            httpURLConnection.setReadTimeout(10000);
+
+            httpURLConnection.setRequestProperty(
+                    "Authorization",
+                    "Basic " + utilidades.credencialesCodificadas
+            );
+
+            httpURLConnection.setRequestProperty(
+                    "Content-Type",
+                    "application/json"
+            );
+
+            int codigo = httpURLConnection.getResponseCode();
+
+            InputStream inputStream;
+
+            if (codigo >= 200 && codigo < 300) {
+                inputStream = new BufferedInputStream(
+                        httpURLConnection.getInputStream()
+                );
+            } else {
+                inputStream = new BufferedInputStream(
+                        httpURLConnection.getErrorStream()
+                );
+            }
+
+            BufferedReader bufferedReader =
+                    new BufferedReader(
+                            new InputStreamReader(inputStream)
+                    );
 
             String linea;
-            while((linea= bufferedReader.readLine())!=null){
+
+            while ((linea = bufferedReader.readLine()) != null) {
                 respuesta.append(linea);
             }
+
+            bufferedReader.close();
+            inputStream.close();
+
         } catch (Exception e) {
-            return e.getMessage();
+
+            return "{\"error\":\"" + e.getMessage() + "\"}";
+
+        } finally {
+
+            if (httpURLConnection != null) {
+                httpURLConnection.disconnect();
+            }
         }
-        finally {
-            httpURLConnection.disconnect();
-        }
+
         return respuesta.toString();
+    }
+
+    @Override
+    protected void onPostExecute(String resultado) {
+        super.onPostExecute(resultado);
     }
 }
