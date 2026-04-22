@@ -5,7 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
@@ -25,6 +25,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -82,7 +84,7 @@ public class MainActivity extends Activity {
             if (parametros != null) {
                 accion = parametros.getString("accion");
 
-                if (accion.equals("modificar")) {
+                if ("modificar".equals(accion)) {
 
                     JSONObject datos = new JSONObject(parametros.getString("amigos"));
 
@@ -90,24 +92,24 @@ public class MainActivity extends Activity {
                     rev = datos.getString("_rev");
                     idProducto = datos.getString("idAmigo");
 
-                    tempVal = findViewById(R.id.txtcodigoAmigos);
-                    tempVal.setText(datos.getString("codigo"));
+                    ((TextView) findViewById(R.id.txtcodigoAmigos))
+                            .setText(datos.getString("codigo"));
 
-                    tempVal = findViewById(R.id.txtdescripcionAmigos);
-                    tempVal.setText(datos.getString("descripcion"));
+                    ((TextView) findViewById(R.id.txtdescripcionAmigos))
+                            .setText(datos.getString("descripcion"));
 
-                    tempVal = findViewById(R.id.txtmarcaAmigos);
-                    tempVal.setText(datos.getString("marca"));
+                    ((TextView) findViewById(R.id.txtmarcaAmigos))
+                            .setText(datos.getString("marca"));
 
-                    tempVal = findViewById(R.id.txtpresentacionAmigos);
-                    tempVal.setText(datos.getString("presentacion"));
+                    ((TextView) findViewById(R.id.txtpresentacionAmigos))
+                            .setText(datos.getString("presentacion"));
 
-                    tempVal = findViewById(R.id.txtprecioAmigos);
-                    tempVal.setText(datos.getString("precio"));
+                    ((TextView) findViewById(R.id.txtprecioAmigos))
+                            .setText(datos.getString("precio"));
 
                     urlFoto = datos.getString("foto");
 
-                    if (!urlFoto.isEmpty()) {
+                    if (urlFoto != null && !urlFoto.isEmpty()) {
                         imgFoto.setImageURI(Uri.parse(urlFoto));
                     }
                 }
@@ -182,32 +184,82 @@ public class MainActivity extends Activity {
                 imgFoto.setImageBitmap(BitmapFactory.decodeFile(urlFoto));
             }
 
-            if (requestCode == GALERIA_CODE) {
-                if (data != null) {
-                    Uri uri = data.getData();
-                    imgFoto.setImageURI(uri);
-                    urlFoto = uri.toString();
-                }
+            if (requestCode == GALERIA_CODE && data != null) {
+                Uri uri = data.getData();
+
+                imgFoto.setImageURI(uri);
+
+                urlFoto = guardarImagenGaleria(uri);
             }
         }
     }
 
+    // 🔥 GUARDAR IMAGEN OPTIMIZADA
+    private String guardarImagenGaleria(Uri uri) {
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(uri);
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+
+            if (inputStream != null) inputStream.close();
+
+            String nombre = "img_" + System.currentTimeMillis() + ".jpg";
+            File archivo = new File(getExternalFilesDir(Environment.DIRECTORY_DCIM), nombre);
+
+            FileOutputStream outputStream = new FileOutputStream(archivo);
+
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream);
+
+            outputStream.flush();
+            outputStream.close();
+
+            return archivo.getAbsolutePath();
+
+        } catch (Exception e) {
+            mostrarMsg("Error imagen: " + e.getMessage());
+            return "";
+        }
+    }
+
+    // ✅ GUARDAR CON ERROR CORREGIDO (NO USA "ok")
     private void guardarProducto() {
         try {
-            tempVal = findViewById(R.id.txtcodigoAmigos);
-            String codigo = tempVal.getText().toString();
+            String codigo = ((TextView) findViewById(R.id.txtcodigoAmigos))
+                    .getText().toString().trim();
 
-            tempVal = findViewById(R.id.txtdescripcionAmigos);
-            String descripcion = tempVal.getText().toString();
+            String descripcion = ((TextView) findViewById(R.id.txtdescripcionAmigos))
+                    .getText().toString().trim();
 
-            tempVal = findViewById(R.id.txtmarcaAmigos);
-            String marca = tempVal.getText().toString();
+            String marca = ((TextView) findViewById(R.id.txtmarcaAmigos))
+                    .getText().toString().trim();
 
-            tempVal = findViewById(R.id.txtpresentacionAmigos);
-            String presentacion = tempVal.getText().toString();
+            String presentacion = ((TextView) findViewById(R.id.txtpresentacionAmigos))
+                    .getText().toString().trim();
 
-            tempVal = findViewById(R.id.txtprecioAmigos);
-            String precio = tempVal.getText().toString();
+            String precio = ((TextView) findViewById(R.id.txtprecioAmigos))
+                    .getText().toString().trim();
+
+            // VALIDACIONES
+            if (codigo.isEmpty() || descripcion.isEmpty() ||
+                    marca.isEmpty() || presentacion.isEmpty() || precio.isEmpty()) {
+                mostrarMsg("Todos los campos son obligatorios");
+                return;
+            }
+
+            try {
+                double p = Double.parseDouble(precio);
+                if (p <= 0) {
+                    mostrarMsg("El precio debe ser mayor a 0");
+                    return;
+                }
+            } catch (Exception e) {
+                mostrarMsg("Precio inválido");
+                return;
+            }
+
+            if (urlFoto == null || urlFoto.isEmpty()) {
+                mostrarMsg("Debe seleccionar una imagen");
+                return;
+            }
 
             String[] datos = {
                     idProducto,
@@ -223,7 +275,7 @@ public class MainActivity extends Activity {
 
             JSONObject datosProducto = new JSONObject();
 
-            if (accion.equals("modificar")) {
+            if ("modificar".equals(accion)) {
                 datosProducto.put("_id", id);
                 datosProducto.put("_rev", rev);
             }
@@ -246,8 +298,12 @@ public class MainActivity extends Activity {
 
             JSONObject json = new JSONObject(respuesta);
 
-            if (json.getBoolean("ok")) {
+            // 🔥 CORRECCIÓN DEFINITIVA DEL ERROR "ok"
+            if (json.has("id")) {
                 id = json.getString("id");
+            }
+
+            if (json.has("rev")) {
                 rev = json.getString("rev");
             }
 
