@@ -17,8 +17,6 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import org.json.JSONObject;
 
 import java.io.File;
@@ -34,7 +32,6 @@ public class MainActivity extends Activity {
 
     Button btnGuardar;
     ImageView imgFoto;
-    FloatingActionButton fab;
 
     String accion = "nuevo";
     String idProducto = "";
@@ -56,17 +53,19 @@ public class MainActivity extends Activity {
 
         imgFoto = findViewById(R.id.imgFotoAmigo);
         btnGuardar = findViewById(R.id.btnGuardarAmigo);
-        fab = findViewById(R.id.fabListaAmigo);
 
         imgFoto.setOnClickListener(v -> menuImagenes());
         btnGuardar.setOnClickListener(v -> guardarProducto());
-        fab.setOnClickListener(v -> regresarLista());
 
         mostrarDatos();
     }
 
-    // QUITADO onResume porque recargaba la foto vieja
-    // y sobrescribía la nueva imagen seleccionada
+    // =========================
+    // GENERAR ID SEGURO
+    // =========================
+    private String generarId() {
+        return String.valueOf(System.currentTimeMillis());
+    }
 
     private void menuImagenes() {
 
@@ -76,17 +75,13 @@ public class MainActivity extends Activity {
                 "Escoger foto tomada"
         };
 
-        AlertDialog.Builder builder =
-                new AlertDialog.Builder(this);
-
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Imagen");
 
         builder.setItems(opciones, (d, which) -> {
-
             if (which == 0) tomarFoto();
             if (which == 1) abrirGaleria();
             if (which == 2) elegirFotoTomada();
-
         });
 
         builder.show();
@@ -95,9 +90,7 @@ public class MainActivity extends Activity {
     private void tomarFoto() {
 
         try {
-
-            Intent intent =
-                    new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
             File archivo = crearArchivoFoto();
 
@@ -107,15 +100,9 @@ public class MainActivity extends Activity {
                     archivo
             );
 
-            intent.putExtra(
-                    MediaStore.EXTRA_OUTPUT,
-                    uri
-            );
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
 
-            startActivityForResult(
-                    intent,
-                    CAMERA_CODE
-            );
+            startActivityForResult(intent, CAMERA_CODE);
 
         } catch (Exception e) {
             mostrarMsg(e.getMessage());
@@ -124,102 +111,33 @@ public class MainActivity extends Activity {
 
     private File crearArchivoFoto() throws Exception {
 
-        String fecha =
-                new SimpleDateFormat(
-                        "yyyyMMdd_HHmmss"
-                ).format(new Date());
+        String fecha = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 
-        File carpeta =
-                getExternalFilesDir(
-                        Environment.DIRECTORY_DCIM
-                );
+        File carpeta = getExternalFilesDir(Environment.DIRECTORY_DCIM);
 
-        if (carpeta != null &&
-                !carpeta.exists()) {
-
+        if (carpeta != null && !carpeta.exists()) {
             carpeta.mkdirs();
         }
 
-        File archivo =
-                File.createTempFile(
-                        "IMG_" + fecha,
-                        ".jpg",
-                        carpeta
-                );
+        File archivo = File.createTempFile("IMG_" + fecha, ".jpg", carpeta);
 
-        urlFoto =
-                archivo.getAbsolutePath();
+        urlFoto = archivo.getAbsolutePath();
 
         return archivo;
     }
 
     private void abrirGaleria() {
 
-        Intent intent =
-                new Intent(
-                        Intent.ACTION_OPEN_DOCUMENT
-                );
-
-        intent.addCategory(
-                Intent.CATEGORY_OPENABLE
-        );
-
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/*");
 
-        intent.addFlags(
-                Intent.FLAG_GRANT_READ_URI_PERMISSION |
-                        Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
-        );
-
-        startActivityForResult(
-                intent,
-                GALERIA_CODE
-        );
-    }
-
-    private void elegirFotoTomada() {
-
-        if (fotosTomadas.size() == 0) {
-            mostrarMsg("No hay fotos");
-            return;
-        }
-
-        String[] lista =
-                new String[fotosTomadas.size()];
-
-        for (int i = 0; i < fotosTomadas.size(); i++) {
-            lista[i] = "Foto " + (i + 1);
-        }
-
-        AlertDialog.Builder builder =
-                new AlertDialog.Builder(this);
-
-        builder.setTitle("Escoger");
-
-        builder.setItems(lista, (d, which) -> {
-
-            urlFoto =
-                    fotosTomadas.get(which);
-
-            imgFoto.setImageBitmap(
-                    BitmapFactory.decodeFile(urlFoto)
-            );
-        });
-
-        builder.show();
+        startActivityForResult(intent, GALERIA_CODE);
     }
 
     @Override
-    protected void onActivityResult(
-            int requestCode,
-            int resultCode,
-            @Nullable Intent data
-    ) {
-        super.onActivityResult(
-                requestCode,
-                resultCode,
-                data
-        );
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
         try {
 
@@ -228,32 +146,30 @@ public class MainActivity extends Activity {
                 if (requestCode == CAMERA_CODE) {
 
                     fotosTomadas.add(urlFoto);
-
-                    imgFoto.setImageBitmap(
-                            BitmapFactory.decodeFile(urlFoto)
-                    );
+                    imgFoto.setImageBitmap(BitmapFactory.decodeFile(urlFoto));
                 }
 
-                if (requestCode == GALERIA_CODE &&
-                        data != null) {
+                if (requestCode == GALERIA_CODE && data != null) {
 
                     Uri uri = data.getData();
 
-                    if (uri != null) {
+                    InputStream input = getContentResolver().openInputStream(uri);
+                    Bitmap bitmap = BitmapFactory.decodeStream(input);
+                    if (input != null) input.close();
 
-                        getContentResolver()
-                                .takePersistableUriPermission(
-                                        uri,
-                                        Intent.FLAG_GRANT_READ_URI_PERMISSION
-                                );
+                    File archivo = new File(
+                            getExternalFilesDir(Environment.DIRECTORY_DCIM),
+                            "GAL_" + System.currentTimeMillis() + ".jpg"
+                    );
 
-                        urlFoto =
-                                guardarImagenGaleria(uri);
+                    FileOutputStream output = new FileOutputStream(archivo);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 85, output);
+                    output.flush();
+                    output.close();
 
-                        imgFoto.setImageBitmap(
-                                BitmapFactory.decodeFile(urlFoto)
-                        );
-                    }
+                    urlFoto = archivo.getAbsolutePath();
+
+                    imgFoto.setImageBitmap(BitmapFactory.decodeFile(urlFoto));
                 }
             }
 
@@ -262,71 +178,150 @@ public class MainActivity extends Activity {
         }
     }
 
-    private String guardarImagenGaleria(Uri uri) {
+    // =========================
+    // 🔥 GUARDAR FINAL CORREGIDO
+    // =========================
+    private void guardarProducto() {
 
         try {
 
-            InputStream input =
-                    getContentResolver()
-                            .openInputStream(uri);
+            String codigo = ((TextView)findViewById(R.id.txtcodigoAmigos))
+                    .getText().toString().trim();
 
-            Bitmap bitmap =
-                    BitmapFactory.decodeStream(input);
+            String descripcion = ((TextView)findViewById(R.id.txtdescripcionAmigos))
+                    .getText().toString().trim();
 
-            if (input != null)
-                input.close();
+            String marca = ((TextView)findViewById(R.id.txtmarcaAmigos))
+                    .getText().toString().trim();
 
-            File archivo =
-                    new File(
-                            getExternalFilesDir(
-                                    Environment.DIRECTORY_DCIM
-                            ),
-                            "GAL_" +
-                                    System.currentTimeMillis() +
-                                    ".jpg"
-                    );
+            String presentacion = ((TextView)findViewById(R.id.txtpresentacionAmigos))
+                    .getText().toString().trim();
 
-            FileOutputStream output =
-                    new FileOutputStream(archivo);
+            String precio = ((TextView)findViewById(R.id.txtprecioAmigos))
+                    .getText().toString().trim();
 
-            bitmap.compress(
-                    Bitmap.CompressFormat.JPEG,
-                    85,
-                    output
-            );
+            String costo = ((TextView)findViewById(R.id.txtcostoAmigos))
+                    .getText().toString().trim();
 
-            output.flush();
-            output.close();
+            String stock = ((TextView)findViewById(R.id.txtstockAmigos))
+                    .getText().toString().trim();
 
-            return archivo.getAbsolutePath();
+            if (codigo.isEmpty() || descripcion.isEmpty() || marca.isEmpty()
+                    || presentacion.isEmpty() || precio.isEmpty()) {
+                mostrarMsg("Complete campos");
+                return;
+            }
+
+            if (urlFoto.isEmpty()) {
+                mostrarMsg("Seleccione imagen");
+                return;
+            }
+
+            detectarinternet di = new detectarinternet(this);
+
+            // 🔥 SIEMPRE ID VALIDO
+            if (idProducto == null || idProducto.trim().isEmpty()) {
+                idProducto = generarId();
+            }
+
+            String[] datos = {
+                    idProducto,
+                    codigo,
+                    descripcion,
+                    marca,
+                    presentacion,
+                    precio,
+                    urlFoto,
+                    costo,
+                    stock
+            };
+
+            JSONObject json = new JSONObject();
+            json.put("idProducto", idProducto);
+            json.put("codigo", codigo);
+            json.put("descripcion", descripcion);
+            json.put("marca", marca);
+            json.put("presentacion", presentacion);
+            json.put("precio", precio);
+            json.put("foto", urlFoto);
+            json.put("costo", costo);
+            json.put("stock", stock);
+
+            if (accion.equals("modificar")) {
+                json.put("_id", id);
+                json.put("_rev", rev);
+            }
+
+            // =========================
+            // 📵 OFFLINE → SQLITE
+            // =========================
+            if (!di.hayConexionInternet()) {
+
+                db.administrar_amigos(accion, datos);
+
+                mostrarMsg("Guardado en SQLite (offline)");
+                regresarLista();
+                return;
+            }
+
+            // =========================
+            // 🌐 ONLINE → COUCHDB
+            // =========================
+            enviarDatosServidor enviar = new enviarDatosServidor(this);
+
+            enviar.execute(
+                    json.toString(),
+                    "POST",
+                    utilidades.url_mto
+            ).get();
+
+            mostrarMsg("Guardado en CouchDB");
+
+            regresarLista();
 
         } catch (Exception e) {
-            return "";
+            mostrarMsg("Error: " + e.getMessage());
         }
+    }
+
+    private void elegirFotoTomada() {
+
+        if (fotosTomadas.isEmpty()) {
+            mostrarMsg("No hay fotos");
+            return;
+        }
+
+        String[] lista = new String[fotosTomadas.size()];
+
+        for (int i = 0; i < fotosTomadas.size(); i++) {
+            lista[i] = "Foto " + (i + 1);
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Escoger foto");
+
+        builder.setItems(lista, (d, which) -> {
+
+            urlFoto = fotosTomadas.get(which);
+
+            imgFoto.setImageBitmap(BitmapFactory.decodeFile(urlFoto));
+        });
+
+        builder.show();
     }
 
     private void mostrarDatos() {
 
         try {
 
-            Bundle b =
-                    getIntent().getExtras();
+            Bundle b = getIntent().getExtras();
+            if (b == null) return;
 
-            if (b == null)
-                return;
-
-            accion =
-                    b.getString(
-                            "accion",
-                            "nuevo"
-                    );
+            accion = b.getString("accion", "nuevo");
 
             if (accion.equals("modificar")) {
 
-                JSONObject datos =
-                        new JSONObject(
-                                b.getString("producto")
-                        );
+                JSONObject datos = new JSONObject(b.getString("producto"));
 
                 id = datos.optString("_id", "");
                 rev = datos.optString("_rev", "");
@@ -347,168 +342,33 @@ public class MainActivity extends Activity {
                 ((TextView)findViewById(R.id.txtprecioAmigos))
                         .setText(datos.optString("precio", ""));
 
-                urlFoto = datos.optString("foto", "");
-
                 ((TextView)findViewById(R.id.txtcostoAmigos))
                         .setText(datos.optString("costo", ""));
 
                 ((TextView)findViewById(R.id.txtstockAmigos))
                         .setText(datos.optString("stock", ""));
 
+                urlFoto = datos.optString("foto", "");
 
-
-                File archivo = new File(urlFoto);
-
-                if (archivo.exists()) {
-
-                    imgFoto.setImageBitmap(
-                            BitmapFactory.decodeFile(urlFoto)
-                    );
+                if (!urlFoto.isEmpty()) {
+                    File file = new File(urlFoto);
+                    if (file.exists()) {
+                        imgFoto.setImageBitmap(BitmapFactory.decodeFile(urlFoto));
+                    }
                 }
             }
 
         } catch (Exception e) {
-            mostrarMsg("Error datos");
-        }
-    }
-
-    private void guardarProducto() {
-
-        try {
-
-            String codigo =
-                    ((TextView)findViewById(R.id.txtcodigoAmigos))
-                            .getText().toString().trim();
-
-            String descripcion =
-                    ((TextView)findViewById(R.id.txtdescripcionAmigos))
-                            .getText().toString().trim();
-
-            String marca =
-                    ((TextView)findViewById(R.id.txtmarcaAmigos))
-                            .getText().toString().trim();
-
-            String presentacion =
-                    ((TextView)findViewById(R.id.txtpresentacionAmigos))
-                            .getText().toString().trim();
-
-            String precio =
-                    ((TextView)findViewById(R.id.txtprecioAmigos))
-                            .getText().toString().trim();
-
-            String costo =
-                    ((TextView)findViewById(R.id.txtcostoAmigos))
-                            .getText().toString().trim();
-
-            String stock =
-                    ((TextView)findViewById(R.id.txtstockAmigos))
-                            .getText().toString().trim();
-
-            if (codigo.isEmpty() ||
-                    descripcion.isEmpty() ||
-                    marca.isEmpty() ||
-                    presentacion.isEmpty() ||
-                    precio.isEmpty()) {
-
-                mostrarMsg("Complete campos");
-                return;
-            }
-
-            if (urlFoto.isEmpty()) {
-                mostrarMsg("Seleccione imagen");
-                return;
-            }
-
-            detectarinternet di =
-                    new detectarinternet(this);
-
-            String[] datos = {
-                    idProducto,
-                    codigo,
-                    descripcion,
-                    marca,
-                    presentacion,
-                    precio,
-                    urlFoto,
-                    costo,
-                    stock
-            };
-
-            db.administrar_amigos(
-                    accion,
-                    datos
-            );
-
-            if (di.hayConexionInternet()) {
-
-                JSONObject json =
-                        new JSONObject();
-
-                if (accion.equals("modificar")) {
-                    json.put("_id", id);
-                    json.put("_rev", rev);
-                }
-
-                if (idProducto.equals("")) {
-                    idProducto =
-                            String.valueOf(
-                                    System.currentTimeMillis()
-                            );
-                }
-
-                json.put("idProducto", idProducto);
-                json.put("codigo", codigo);
-                json.put("descripcion", descripcion);
-                json.put("marca", marca);
-                json.put("presentacion", presentacion);
-                json.put("precio", precio);
-                json.put("foto", urlFoto);
-                json.put("costo", costo);
-                json.put("stock", stock);
-
-                enviarDatosServidor enviar =
-                        new enviarDatosServidor(this);
-
-                enviar.execute(
-                        json.toString(),
-                        "POST",
-                        utilidades.url_mto
-                ).get();
-
-                mostrarMsg("Guardado en CouchDB");
-            } else {
-                mostrarMsg("Guardado en SQLite");
-            }
-
-            regresarLista();
-
-        } catch (Exception e) {
-
-            mostrarMsg(
-                    "Error: " +
-                            e.getMessage()
-            );
+            mostrarMsg("Error cargar datos");
         }
     }
 
     private void regresarLista() {
-
-        Intent i =
-                new Intent(
-                        this,
-                        lista_producto.class
-                );
-
-        startActivity(i);
+        startActivity(new Intent(this, lista_producto.class));
         finish();
     }
 
     private void mostrarMsg(String msg) {
-
-        Toast.makeText(
-                this,
-                msg,
-                Toast.LENGTH_LONG
-        ).show();
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
     }
 }
