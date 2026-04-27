@@ -29,6 +29,7 @@ public class lista_producto extends Activity {
 
     DB db;
     FloatingActionButton fab;
+    FloatingActionButton fabRecargar;
     ListView lista;
     Cursor cursor;
 
@@ -56,6 +57,13 @@ public class lista_producto extends Activity {
 
         fab = findViewById(R.id.fabAgregarAmigos);
         lista = findViewById(R.id.ltsAmigos);
+
+        fabRecargar = findViewById(R.id.fabRecargar);
+
+        fabRecargar.setOnClickListener(v -> {
+            mostrarMsg("Actualizando...");
+            obtenerProductos();
+        });
 
         fab.setOnClickListener(v -> abrirFormulario());
 
@@ -287,6 +295,8 @@ public class lista_producto extends Activity {
                             int b,
                             int c
                     ) {
+
+
 
                         listaProductos.clear();
 

@@ -58,7 +58,7 @@ public class MainActivity extends Activity {
         btnGuardar = findViewById(R.id.btnGuardarAmigo);
         fabRegresar = findViewById(R.id.fabListaAmigo);
 
-        // 🔥 BOTÓN REGRESAR
+
         fabRegresar.setOnClickListener(v -> {
             Intent i = new Intent(MainActivity.this, lista_producto.class);
             startActivity(i);
@@ -68,20 +68,16 @@ public class MainActivity extends Activity {
         imgFoto.setOnClickListener(v -> menuImagenes());
         btnGuardar.setOnClickListener(v -> guardarProducto());
 
-        // 🔥 CARGAR DATOS EDITAR
+
         mostrarDatos();
     }
 
-    // =========================
-    // ID ÚNICO
-    // =========================
+
     private String generarId() {
         return String.valueOf(System.currentTimeMillis());
     }
 
-    // =========================
-    // MENÚ IMAGEN
-    // =========================
+
     private void menuImagenes() {
 
         String[] opciones = {
@@ -102,9 +98,7 @@ public class MainActivity extends Activity {
         builder.show();
     }
 
-    // =========================
-    // CÁMARA
-    // =========================
+
     private void tomarFoto() {
 
         try {
@@ -144,9 +138,7 @@ public class MainActivity extends Activity {
         return archivo;
     }
 
-    // =========================
-    // GALERÍA
-    // =========================
+
     private void abrirGaleria() {
 
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
@@ -156,9 +148,7 @@ public class MainActivity extends Activity {
         startActivityForResult(intent, GALERIA_CODE);
     }
 
-    // =========================
-    // RESULTADOS
-    // =========================
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -205,9 +195,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    // =========================
-    // GUARDAR
-    // =========================
+
     private void guardarProducto() {
 
         try {
@@ -268,7 +256,7 @@ public class MainActivity extends Activity {
                 return;
             }
 
-            // ONLINE (NO BLOQUEA UI)
+
             enviarDatosServidor enviar = new enviarDatosServidor(this);
 
             enviar.execute(
@@ -285,9 +273,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    // =========================
-    // ESCOGER FOTO
-    // =========================
+
     private void elegirFotoTomada() {
 
         if (fotosTomadas.isEmpty()) {
@@ -313,9 +299,7 @@ public class MainActivity extends Activity {
         builder.show();
     }
 
-    // =========================
-    // CARGAR DATOS (CORREGIDO)
-    // =========================
+
     private void mostrarDatos() {
 
         try {
@@ -356,9 +340,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    // =========================
-    // REGRESAR
-    // =========================
+
     private void regresarLista() {
         startActivity(new Intent(this, lista_producto.class));
         finish();

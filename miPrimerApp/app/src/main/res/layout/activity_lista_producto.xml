@@ -3,38 +3,64 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/darkGray">
+    android:background="#1B1B1B">
 
-    <EditText
-        android:id="@+id/txtBuscarAmigos"
-        android:hint="Buscar producto"
-        android:textColor="@color/white"
-        android:textColorHint="@color/grayText"
-        android:backgroundTint="@color/accent"
-        android:drawableStart="@android:drawable/ic_menu_search"
-        android:layout_margin="15dp"
-        android:padding="10dp"
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardBuscar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        app:cardCornerRadius="14dp"
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="#242424">
+
+        <EditText
+            android:id="@+id/txtBuscarAmigos"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Buscar producto..."
+            android:padding="12dp"
+            android:textColor="#E0E0E0"
+            android:textColorHint="#9E9E9E"
+            android:background="@android:color/transparent"
+            android:drawableStart="@android:drawable/ic_menu_search"
+            android:drawablePadding="10dp"/>
+    </androidx.cardview.widget.CardView>
+
 
     <ListView
         android:id="@+id/ltsAmigos"
-        android:layout_below="@id/txtBuscarAmigos"
-        android:layout_marginBottom="80dp"
-        android:divider="@color/grayText"
-        android:dividerHeight="1dp"
+        android:layout_below="@id/cardBuscar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_marginBottom="90dp"
+        android:divider="#2F2F2F"
+        android:dividerHeight="1dp"
+        android:background="#1B1B1B"/>
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAgregarAmigos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_margin="20dp"
+        android:layout_margin="18dp"
         android:src="@android:drawable/ic_input_add"
-        app:backgroundTint="@color/accent"
-        android:tint="@color/black"
+        app:backgroundTint="#2E2E2E"
+        android:tint="#FFFFFF"/>
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabRecargar"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_margin="18dp"
+        android:src="@android:drawable/ic_popup_sync"
+        app:backgroundTint="#2E2E2E"
+        android:tint="#FFFFFF"/>
 
 </RelativeLayout>
