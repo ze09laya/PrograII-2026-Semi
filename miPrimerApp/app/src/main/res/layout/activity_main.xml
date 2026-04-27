@@ -1,94 +1,150 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/black">
 
-    <EditText
-        android:id="@+id/txtcodigoAmigos"
-        android:hint="Código"
-        android:textColor="@color/white"
-        android:textColorHint="@color/grayText"
-        android:backgroundTint="@color/accent"
-        android:layout_margin="20dp"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:paddingBottom="90dp">
 
-    <EditText
-        android:id="@+id/txtdescripcionAmigos"
-        android:hint="Descripción"
-        android:textColor="@color/white"
-        android:textColorHint="@color/grayText"
-        android:backgroundTint="@color/accent"
-        android:layout_below="@id/txtcodigoAmigos"
-        android:layout_margin="20dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        <!-- CODIGO -->
+        <EditText
+            android:id="@+id/txtcodigoAmigos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:hint="Código"
+            android:textColor="@color/white"
+            android:textColorHint="@color/grayText"
+            android:backgroundTint="@color/accent" />
 
-    <EditText
-        android:id="@+id/txtmarcaAmigos"
-        android:hint="Marca"
-        android:textColor="@color/white"
-        android:textColorHint="@color/grayText"
-        android:backgroundTint="@color/accent"
-        android:layout_below="@id/txtdescripcionAmigos"
-        android:layout_margin="20dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        <!-- DESCRIPCION -->
+        <EditText
+            android:id="@+id/txtdescripcionAmigos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txtcodigoAmigos"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="10dp"
+            android:hint="Descripción"
+            android:textColor="@color/white"
+            android:textColorHint="@color/grayText"
+            android:backgroundTint="@color/accent" />
 
-    <EditText
-        android:id="@+id/txtpresentacionAmigos"
-        android:hint="Presentación"
-        android:textColor="@color/white"
-        android:textColorHint="@color/grayText"
-        android:backgroundTint="@color/accent"
-        android:layout_below="@id/txtmarcaAmigos"
-        android:layout_margin="20dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        <!-- MARCA -->
+        <EditText
+            android:id="@+id/txtmarcaAmigos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txtdescripcionAmigos"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="10dp"
+            android:hint="Marca"
+            android:textColor="@color/white"
+            android:textColorHint="@color/grayText"
+            android:backgroundTint="@color/accent" />
 
-    <EditText
-        android:id="@+id/txtprecioAmigos"
-        android:hint="Precio"
-        android:inputType="numberDecimal"
-        android:textColor="@color/white"
-        android:textColorHint="@color/grayText"
-        android:backgroundTint="@color/accent"
-        android:layout_below="@id/txtpresentacionAmigos"
-        android:layout_margin="20dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        <!-- PRESENTACION -->
+        <EditText
+            android:id="@+id/txtpresentacionAmigos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txtmarcaAmigos"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="10dp"
+            android:hint="Presentación"
+            android:textColor="@color/white"
+            android:textColorHint="@color/grayText"
+            android:backgroundTint="@color/accent" />
 
-    <ImageButton
-        android:id="@+id/imgFotoAmigo"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:layout_below="@id/txtprecioAmigos"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:src="@drawable/camara"
-        android:background="@color/darkGray"
-        android:scaleType="centerCrop"/>
+        <!-- PRECIO -->
+        <EditText
+            android:id="@+id/txtprecioAmigos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txtpresentacionAmigos"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="10dp"
+            android:hint="Precio"
+            android:inputType="numberDecimal"
+            android:textColor="@color/white"
+            android:textColorHint="@color/grayText"
+            android:backgroundTint="@color/accent" />
 
-    <Button
-        android:id="@+id/btnGuardarAmigo"
-        android:text="Guardar Producto"
-        android:textColor="@color/black"
-        android:backgroundTint="@color/accent"
-        android:layout_below="@id/imgFotoAmigo"
-        android:layout_margin="20dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        <!-- COSTO -->
+        <EditText
+            android:id="@+id/txtcostoAmigos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txtprecioAmigos"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="10dp"
+            android:hint="Costo"
+            android:inputType="numberDecimal"
+            android:textColor="@color/white"
+            android:textColorHint="@color/grayText"
+            android:backgroundTint="@color/accent" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabListaAmigo"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="20dp"
-        android:src="@android:drawable/ic_media_previous"
-        app:backgroundTint="@color/accent"
-        android:tint="@color/black"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        <!-- STOCK -->
+        <EditText
+            android:id="@+id/txtstockAmigos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txtcostoAmigos"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="10dp"
+            android:hint="Stock"
+            android:inputType="number"
+            android:textColor="@color/white"
+            android:textColorHint="@color/grayText"
+            android:backgroundTint="@color/accent" />
 
-</RelativeLayout>
+        <!-- FOTO -->
+        <ImageButton
+            android:id="@+id/imgFotoAmigo"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:layout_below="@id/txtstockAmigos"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:background="@color/darkGray"
+            android:src="@drawable/camara"
+            android:scaleType="centerCrop" />
+
+        <!-- GUARDAR -->
+        <Button
+            android:id="@+id/btnGuardarAmigo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/imgFotoAmigo"
+            android:layout_margin="20dp"
+            android:text="Guardar Producto"
+            android:textColor="@color/black"
+            android:backgroundTint="@color/accent" />
+
+        <!-- REGRESAR -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabListaAmigo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="20dp"
+            android:src="@android:drawable/ic_media_previous"
+            android:tint="@color/black"
+            app:backgroundTint="@color/accent" />
+
+    </RelativeLayout>
+
+</ScrollView>

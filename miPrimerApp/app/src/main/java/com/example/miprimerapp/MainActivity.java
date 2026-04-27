@@ -65,16 +65,9 @@ public class MainActivity extends Activity {
         mostrarDatos();
     }
 
-    //==================================================
-    // RECARGA AUTOMÁTICA
-    //==================================================
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mostrarDatos();
-    }
+    // QUITADO onResume porque recargaba la foto vieja
+    // y sobrescribía la nueva imagen seleccionada
 
-    //==================================================
     private void menuImagenes() {
 
         String[] opciones = {
@@ -99,7 +92,6 @@ public class MainActivity extends Activity {
         builder.show();
     }
 
-    //==================================================
     private void tomarFoto() {
 
         try {
@@ -130,8 +122,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    private File crearArchivoFoto()
-            throws Exception {
+    private File crearArchivoFoto() throws Exception {
 
         String fecha =
                 new SimpleDateFormat(
@@ -162,7 +153,6 @@ public class MainActivity extends Activity {
         return archivo;
     }
 
-    //==================================================
     private void abrirGaleria() {
 
         Intent intent =
@@ -187,7 +177,6 @@ public class MainActivity extends Activity {
         );
     }
 
-    //==================================================
     private void elegirFotoTomada() {
 
         if (fotosTomadas.size() == 0) {
@@ -198,12 +187,8 @@ public class MainActivity extends Activity {
         String[] lista =
                 new String[fotosTomadas.size()];
 
-        for (int i = 0;
-             i < fotosTomadas.size();
-             i++) {
-
-            lista[i] =
-                    "Foto " + (i + 1);
+        for (int i = 0; i < fotosTomadas.size(); i++) {
+            lista[i] = "Foto " + (i + 1);
         }
 
         AlertDialog.Builder builder =
@@ -217,16 +202,13 @@ public class MainActivity extends Activity {
                     fotosTomadas.get(which);
 
             imgFoto.setImageBitmap(
-                    BitmapFactory.decodeFile(
-                            urlFoto
-                    )
+                    BitmapFactory.decodeFile(urlFoto)
             );
         });
 
         builder.show();
     }
 
-    //==================================================
     @Override
     protected void onActivityResult(
             int requestCode,
@@ -243,24 +225,19 @@ public class MainActivity extends Activity {
 
             if (resultCode == RESULT_OK) {
 
-                if (requestCode ==
-                        CAMERA_CODE) {
+                if (requestCode == CAMERA_CODE) {
 
                     fotosTomadas.add(urlFoto);
 
                     imgFoto.setImageBitmap(
-                            BitmapFactory.decodeFile(
-                                    urlFoto
-                            )
+                            BitmapFactory.decodeFile(urlFoto)
                     );
                 }
 
-                if (requestCode ==
-                        GALERIA_CODE &&
+                if (requestCode == GALERIA_CODE &&
                         data != null) {
 
-                    Uri uri =
-                            data.getData();
+                    Uri uri = data.getData();
 
                     if (uri != null) {
 
@@ -271,14 +248,10 @@ public class MainActivity extends Activity {
                                 );
 
                         urlFoto =
-                                guardarImagenGaleria(
-                                        uri
-                                );
+                                guardarImagenGaleria(uri);
 
                         imgFoto.setImageBitmap(
-                                BitmapFactory.decodeFile(
-                                        urlFoto
-                                )
+                                BitmapFactory.decodeFile(urlFoto)
                         );
                     }
                 }
@@ -289,10 +262,8 @@ public class MainActivity extends Activity {
         }
     }
 
-    //==================================================
-    private String guardarImagenGaleria(
-            Uri uri
-    ) {
+    private String guardarImagenGaleria(Uri uri) {
+
         try {
 
             InputStream input =
@@ -300,9 +271,7 @@ public class MainActivity extends Activity {
                             .openInputStream(uri);
 
             Bitmap bitmap =
-                    BitmapFactory.decodeStream(
-                            input
-                    );
+                    BitmapFactory.decodeStream(input);
 
             if (input != null)
                 input.close();
@@ -318,9 +287,7 @@ public class MainActivity extends Activity {
                     );
 
             FileOutputStream output =
-                    new FileOutputStream(
-                            archivo
-                    );
+                    new FileOutputStream(archivo);
 
             bitmap.compress(
                     Bitmap.CompressFormat.JPEG,
@@ -331,15 +298,13 @@ public class MainActivity extends Activity {
             output.flush();
             output.close();
 
-            return archivo
-                    .getAbsolutePath();
+            return archivo.getAbsolutePath();
 
         } catch (Exception e) {
             return "";
         }
     }
 
-    //==================================================
     private void mostrarDatos() {
 
         try {
@@ -356,90 +321,48 @@ public class MainActivity extends Activity {
                             "nuevo"
                     );
 
-            if (accion.equals(
-                    "modificar"
-            )) {
+            if (accion.equals("modificar")) {
 
                 JSONObject datos =
                         new JSONObject(
-                                b.getString(
-                                        "producto"
-                                )
+                                b.getString("producto")
                         );
 
-                id =
-                        datos.optString(
-                                "_id",
-                                ""
-                        );
+                id = datos.optString("_id", "");
+                rev = datos.optString("_rev", "");
+                idProducto = datos.optString("idProducto", "");
 
-                rev =
-                        datos.optString(
-                                "_rev",
-                                ""
-                        );
+                ((TextView)findViewById(R.id.txtcodigoAmigos))
+                        .setText(datos.optString("codigo", ""));
 
-                idProducto =
-                        datos.optString(
-                                "idProducto",
-                                ""
-                        );
+                ((TextView)findViewById(R.id.txtdescripcionAmigos))
+                        .setText(datos.optString("descripcion", ""));
 
-                ((TextView)findViewById(
-                        R.id.txtcodigoAmigos))
-                        .setText(
-                                datos.optString(
-                                        "codigo",
-                                        ""
-                                ));
+                ((TextView)findViewById(R.id.txtmarcaAmigos))
+                        .setText(datos.optString("marca", ""));
 
-                ((TextView)findViewById(
-                        R.id.txtdescripcionAmigos))
-                        .setText(
-                                datos.optString(
-                                        "descripcion",
-                                        ""
-                                ));
+                ((TextView)findViewById(R.id.txtpresentacionAmigos))
+                        .setText(datos.optString("presentacion", ""));
 
-                ((TextView)findViewById(
-                        R.id.txtmarcaAmigos))
-                        .setText(
-                                datos.optString(
-                                        "marca",
-                                        ""
-                                ));
+                ((TextView)findViewById(R.id.txtprecioAmigos))
+                        .setText(datos.optString("precio", ""));
 
-                ((TextView)findViewById(
-                        R.id.txtpresentacionAmigos))
-                        .setText(
-                                datos.optString(
-                                        "presentacion",
-                                        ""
-                                ));
+                urlFoto = datos.optString("foto", "");
 
-                ((TextView)findViewById(
-                        R.id.txtprecioAmigos))
-                        .setText(
-                                datos.optString(
-                                        "precio",
-                                        ""
-                                ));
+                ((TextView)findViewById(R.id.txtcostoAmigos))
+                        .setText(datos.optString("costo", ""));
 
-                urlFoto =
-                        datos.optString(
-                                "foto",
-                                ""
-                        );
+                ((TextView)findViewById(R.id.txtstockAmigos))
+                        .setText(datos.optString("stock", ""));
 
-                File archivo =
-                        new File(urlFoto);
+
+
+                File archivo = new File(urlFoto);
 
                 if (archivo.exists()) {
 
                     imgFoto.setImageBitmap(
-                            BitmapFactory.decodeFile(
-                                    urlFoto
-                            )
+                            BitmapFactory.decodeFile(urlFoto)
                     );
                 }
             }
@@ -449,47 +372,37 @@ public class MainActivity extends Activity {
         }
     }
 
-    //==================================================
-    // GUARDADO SEPARADO
-    //==================================================
     private void guardarProducto() {
 
         try {
 
             String codigo =
-                    ((TextView)findViewById(
-                            R.id.txtcodigoAmigos))
-                            .getText()
-                            .toString()
-                            .trim();
+                    ((TextView)findViewById(R.id.txtcodigoAmigos))
+                            .getText().toString().trim();
 
             String descripcion =
-                    ((TextView)findViewById(
-                            R.id.txtdescripcionAmigos))
-                            .getText()
-                            .toString()
-                            .trim();
+                    ((TextView)findViewById(R.id.txtdescripcionAmigos))
+                            .getText().toString().trim();
 
             String marca =
-                    ((TextView)findViewById(
-                            R.id.txtmarcaAmigos))
-                            .getText()
-                            .toString()
-                            .trim();
+                    ((TextView)findViewById(R.id.txtmarcaAmigos))
+                            .getText().toString().trim();
 
             String presentacion =
-                    ((TextView)findViewById(
-                            R.id.txtpresentacionAmigos))
-                            .getText()
-                            .toString()
-                            .trim();
+                    ((TextView)findViewById(R.id.txtpresentacionAmigos))
+                            .getText().toString().trim();
 
             String precio =
-                    ((TextView)findViewById(
-                            R.id.txtprecioAmigos))
-                            .getText()
-                            .toString()
-                            .trim();
+                    ((TextView)findViewById(R.id.txtprecioAmigos))
+                            .getText().toString().trim();
+
+            String costo =
+                    ((TextView)findViewById(R.id.txtcostoAmigos))
+                            .getText().toString().trim();
+
+            String stock =
+                    ((TextView)findViewById(R.id.txtstockAmigos))
+                            .getText().toString().trim();
 
             if (codigo.isEmpty() ||
                     descripcion.isEmpty() ||
@@ -497,141 +410,75 @@ public class MainActivity extends Activity {
                     presentacion.isEmpty() ||
                     precio.isEmpty()) {
 
-                mostrarMsg(
-                        "Complete campos"
-                );
+                mostrarMsg("Complete campos");
                 return;
             }
 
             if (urlFoto.isEmpty()) {
-                mostrarMsg(
-                        "Seleccione imagen"
-                );
+                mostrarMsg("Seleccione imagen");
                 return;
             }
 
             detectarinternet di =
                     new detectarinternet(this);
 
-            //==========================================
-            // SIN INTERNET -> SQLITE
-            //==========================================
-            if (!di.hayConexionInternet()) {
+            String[] datos = {
+                    idProducto,
+                    codigo,
+                    descripcion,
+                    marca,
+                    presentacion,
+                    precio,
+                    urlFoto,
+                    costo,
+                    stock
+            };
 
-                String[] datos = {
-                        idProducto,
-                        codigo,
-                        descripcion,
-                        marca,
-                        presentacion,
-                        precio,
-                        urlFoto
-                };
+            db.administrar_amigos(
+                    accion,
+                    datos
+            );
 
-                db.administrar_amigos(
-                        accion,
-                        datos
-                );
+            if (di.hayConexionInternet()) {
 
-                mostrarMsg(
-                        "Guardado en SQLite"
-                );
+                JSONObject json =
+                        new JSONObject();
 
-                regresarLista();
-                return;
+                if (accion.equals("modificar")) {
+                    json.put("_id", id);
+                    json.put("_rev", rev);
+                }
+
+                if (idProducto.equals("")) {
+                    idProducto =
+                            String.valueOf(
+                                    System.currentTimeMillis()
+                            );
+                }
+
+                json.put("idProducto", idProducto);
+                json.put("codigo", codigo);
+                json.put("descripcion", descripcion);
+                json.put("marca", marca);
+                json.put("presentacion", presentacion);
+                json.put("precio", precio);
+                json.put("foto", urlFoto);
+                json.put("costo", costo);
+                json.put("stock", stock);
+
+                enviarDatosServidor enviar =
+                        new enviarDatosServidor(this);
+
+                enviar.execute(
+                        json.toString(),
+                        "POST",
+                        utilidades.url_mto
+                ).get();
+
+                mostrarMsg("Guardado en CouchDB");
+            } else {
+                mostrarMsg("Guardado en SQLite");
             }
-
-            //==========================================
-            // CON INTERNET -> COUCHDB
-            //==========================================
-            JSONObject json =
-                    new JSONObject();
-
-            if (accion.equals(
-                    "modificar"
-            )) {
-
-                json.put("_id", id);
-                json.put("_rev", rev);
-            }
-
-            if (idProducto.equals("")) {
-
-                idProducto =
-                        String.valueOf(
-                                System.currentTimeMillis()
-                        );
-            }
-
-            json.put(
-                    "idProducto",
-                    idProducto
-            );
-
-            json.put(
-                    "codigo",
-                    codigo
-            );
-
-            json.put(
-                    "descripcion",
-                    descripcion
-            );
-
-            json.put(
-                    "marca",
-                    marca
-            );
-
-            json.put(
-                    "presentacion",
-                    presentacion
-            );
-
-            json.put(
-                    "precio",
-                    precio
-            );
-
-            json.put(
-                    "foto",
-                    urlFoto
-            );
-
-            enviarDatosServidor enviar =
-                    new enviarDatosServidor(
-                            this
-                    );
-
-            String respuesta =
-                    enviar.execute(
-                            json.toString(),
-                            "POST",
-                            utilidades.url_mto
-                    ).get();
-
-            JSONObject resp =
-                    new JSONObject(
-                            respuesta
-                    );
-
-            if (resp.has("id")) {
-                id =
-                        resp.getString(
-                                "id"
-                        );
-            }
-
-            if (resp.has("rev")) {
-                rev =
-                        resp.getString(
-                                "rev"
-                        );
-            }
-
-            mostrarMsg(
-                    "Guardado en CouchDB"
-            );
 
             regresarLista();
 
@@ -644,7 +491,6 @@ public class MainActivity extends Activity {
         }
     }
 
-    //==================================================
     private void regresarLista() {
 
         Intent i =
@@ -657,9 +503,8 @@ public class MainActivity extends Activity {
         finish();
     }
 
-    private void mostrarMsg(
-            String msg
-    ) {
+    private void mostrarMsg(String msg) {
+
         Toast.makeText(
                 this,
                 msg,
