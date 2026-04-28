@@ -9,15 +9,14 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class AdaptadorProducto extends BaseAdapter {
 
-    Context context;
-    ArrayList<producto> listaProductos;
-    LayoutInflater inflater;
+    private final Context context;
+    private final ArrayList<producto> listaProductos;
+    private final LayoutInflater inflater;
 
     public AdaptadorProducto(Context context, ArrayList<producto> listaProductos) {
         this.context = context;
@@ -27,50 +26,82 @@ public class AdaptadorProducto extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return listaProductos.size();
+        return listaProductos != null ? listaProductos.size() : 0;
     }
 
     @Override
-    public Object getItem(int position) {
+    public producto getItem(int position) {
         return listaProductos.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return position; // mejor que 0
+        return position;
+    }
+
+    static class ViewHolder {
+        TextView lblCodigo;
+        TextView lblDescripcion;
+        TextView lblMarca;
+        TextView txtGanancia;
+        ImageView imgFoto;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
+        ViewHolder holder;
+
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.fotos, parent, false);
+            holder = new ViewHolder();
+            holder.lblCodigo     = convertView.findViewById(R.id.lblcodigoAdaptador);
+            holder.lblDescripcion = convertView.findViewById(R.id.lbldescripcionAdaptador);
+            holder.lblMarca      = convertView.findViewById(R.id.lblmarcaAdaptador);
+            holder.txtGanancia   = convertView.findViewById(R.id.txtGanancia);
+            holder.imgFoto       = convertView.findViewById(R.id.imgFotoAdaptador);
+            convertView.setTag(holder);
+        } else {
+            holder = (ViewHolder) convertView.getTag();
         }
 
-        try {
-            producto producto = listaProductos.get(position);
+        producto p = listaProductos.get(position);
 
-            TextView lblCodigo = convertView.findViewById(R.id.lblcodigoAdaptador);
-            TextView lblDescripcion = convertView.findViewById(R.id.lbldescripcionAdaptador);
-            TextView lblMarca = convertView.findViewById(R.id.lblmarcaAdaptador);
-            ImageView imgFoto = convertView.findViewById(R.id.imgFotoAdaptador);
+        holder.lblCodigo.setText(p.getCodigo());
+        holder.lblDescripcion.setText(p.getDescripcion());
+        holder.lblMarca.setText(p.getMarca());
 
-            lblCodigo.setText(producto.getCodigo());
-            lblDescripcion.setText(producto.getDescripcion());
-            lblMarca.setText(producto.getMarca());
-
-            Bitmap bitmap = BitmapFactory.decodeFile(producto.getFoto());
-
-            if (bitmap != null) {
-                imgFoto.setImageBitmap(bitmap);
-            } else {
-                imgFoto.setImageResource(android.R.drawable.ic_menu_report_image);
-            }
-
-        } catch (Exception e) {
-            Toast.makeText(context, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
-        }
+        cargarFoto(holder.imgFoto, p.getFoto());
+        mostrarGanancia(holder.txtGanancia, p.getGanancia());
 
         return convertView;
+    }
+
+    private void cargarFoto(ImageView imageView, String rutaFoto) {
+        if (rutaFoto == null || rutaFoto.trim().isEmpty()) {
+            imageView.setImageResource(android.R.drawable.ic_menu_report_image);
+            return;
+        }
+
+        Bitmap bitmap = BitmapFactory.decodeFile(rutaFoto.trim());
+        if (bitmap != null) {
+            imageView.setImageBitmap(bitmap);
+        } else {
+            imageView.setImageResource(android.R.drawable.ic_menu_report_image);
+        }
+    }
+
+    private void mostrarGanancia(TextView textView, String gananciaStr) {
+        double ganancia = 0.0;
+
+        if (gananciaStr != null && !gananciaStr.trim().isEmpty()) {
+            try {
+                ganancia = Double.parseDouble(gananciaStr.trim());
+            } catch (NumberFormatException e) {
+                ganancia = 0.0;
+            }
+        }
+
+        textView.setText(String.format("Ganancia: %.2f%%", ganancia));
     }
 }

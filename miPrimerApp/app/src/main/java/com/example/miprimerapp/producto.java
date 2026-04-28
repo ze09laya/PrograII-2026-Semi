@@ -13,7 +13,9 @@ public class producto {
 
     private String stock;
 
-    public producto(String idProducto, String codigo, String descripcion, String marca, String presentacion, String precio, String foto, String costo, String stock) {
+    private String ganancia;
+
+    public producto(String idProducto, String codigo, String descripcion, String marca, String presentacion, String precio, String foto, String costo, String stock, String ganancia) {
         this.idProducto = idProducto;
         this.codigo = codigo;
         this.descripcion = descripcion;
@@ -23,6 +25,9 @@ public class producto {
         this.foto = foto;
         this.costo = costo;
         this.stock = stock;
+        this. ganancia= ganancia;
+
+
     }
 
     public String getIdProducto() {
@@ -95,5 +100,13 @@ public class producto {
         this.stock = stock;
     }
 
+
+
+    public String getGanancia() {
+        return ganancia;
+    }
+    public void setGanancia(String ganancia) {
+        this.ganancia = ganancia;
+    }
 
 }

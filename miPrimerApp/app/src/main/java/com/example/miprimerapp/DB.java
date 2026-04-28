@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
 public class DB extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "producto.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 5;
 
     private static final String SQLdb =
             "CREATE TABLE producto (" +
@@ -24,7 +24,8 @@ public class DB extends SQLiteOpenHelper {
                     "precio TEXT, " +
                     "urlFoto TEXT, " +
                     "costo TEXT, " +
-                    "stock TEXT)";
+                    "stock TEXT, " +
+                    "ganancia TEXT)";
 
     public DB(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -45,11 +46,8 @@ public class DB extends SQLiteOpenHelper {
 
         try {
 
-            SQLiteDatabase db =
-                    getWritableDatabase();
-
-            ContentValues valores =
-                    new ContentValues();
+            SQLiteDatabase db = getWritableDatabase();
+            ContentValues valores = new ContentValues();
 
             switch (accion) {
 
@@ -64,13 +62,9 @@ public class DB extends SQLiteOpenHelper {
                     valores.put("urlFoto", datos[6]);
                     valores.put("costo", datos[7]);
                     valores.put("stock", datos[8]);
+                    valores.put("ganancia", datos[9]);
 
-                    db.insert(
-                            "producto",
-                            null,
-                            valores
-                    );
-
+                    db.insert("producto", null, valores);
                     break;
 
                 case "modificar":
@@ -83,6 +77,7 @@ public class DB extends SQLiteOpenHelper {
                     valores.put("urlFoto", datos[6]);
                     valores.put("costo", datos[7]);
                     valores.put("stock", datos[8]);
+                    valores.put("ganancia", datos[9]);
 
                     db.update(
                             "producto",
@@ -114,8 +109,7 @@ public class DB extends SQLiteOpenHelper {
 
     public Cursor lista_amigos() {
 
-        SQLiteDatabase db =
-                getReadableDatabase();
+        SQLiteDatabase db = getReadableDatabase();
 
         return db.rawQuery(
                 "SELECT * FROM producto",
