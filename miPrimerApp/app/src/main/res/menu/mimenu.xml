@@ -1,8 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/mnxAgregar" android:title="Agregar" />
-    <item android:id="@+id/mnxModificar" android:title="Modificar" />
-    <item android:id="@+id/mnxEliminar" android:title="Eliminar" />
+
+    <item
+        android:id="@+id/mnxAgregar"
+        android:title="➕ Agregar producto"
+        android:icon="@android:drawable/ic_menu_add"
+        app:showAsAction="never" />
+
+
+    <item
+        android:id="@+id/mnxModificar"
+        android:title="✏️ Modificar producto"
+        android:icon="@android:drawable/ic_menu_edit"
+        app:showAsAction="never" />
+
+
+    <item
+        android:id="@+id/mnxEliminar"
+        android:title="🗑 Eliminar producto"
+        android:icon="@android:drawable/ic_menu_delete"
+        app:showAsAction="never" />
+
 </menu>
