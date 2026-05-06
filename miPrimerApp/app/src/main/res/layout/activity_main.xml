@@ -5,223 +5,406 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="#121212">
+    android:background="#FFF8E1">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="22dp">
+        android:padding="20dp">
 
-        <!-- ICONO -->
-        <ImageView
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            android:layout_gravity="center"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/bg_circle_purple"
-            android:src="@drawable/camara"
-            app:tint="#B388FF"
-            android:padding="10dp"/>
+        <!-- HEADER -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginBottom="24dp">
 
-        <!-- TITULO -->
+            <ImageView
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_circle_purple"
+                android:src="@drawable/nino"
+                app:tint="#FF9800"
+                android:padding="14dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mi Día"
+                android:textColor="#FF9800"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cuenta cómo fue tu día"
+                android:textColor="#888888"
+                android:textSize="13sp"/>
+        </LinearLayout>
+
+        <!-- NOMBRE DEL NIÑO -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="NUEVO PRODUCTO"
-            android:textColor="#B388FF"
-            android:textSize="18sp"
+            android:text="Nombre del niño"
+            android:textColor="#888888"
+            android:textSize="12sp"
             android:textStyle="bold"
-            android:gravity="center"
             android:layout_marginBottom="6dp"/>
 
-        <View
-            android:layout_width="60dp"
-            android:layout_height="2dp"
-            android:layout_gravity="center"
-            android:background="#7C4DFF"
-            android:layout_marginBottom="20dp"/>
-
-        <!-- CODIGO -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_input_purple"
-            android:orientation="horizontal"
-            android:padding="14dp"
-            android:layout_marginBottom="10dp"
-            android:gravity="center_vertical">
-
-            <EditText
-                android:id="@+id/txtcodigoAmigos"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Código"
-                android:textColor="#FFFFFF"
-                android:textColorHint="#777777"
-                android:background="@null"/>
-        </LinearLayout>
-
-        <!-- DESCRIPCION -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_input_purple"
-            android:orientation="horizontal"
-            android:padding="14dp"
-            android:layout_marginBottom="10dp">
+            android:padding="12dp"
+            android:layout_marginBottom="14dp">
 
             <EditText
                 android:id="@+id/txtdescripcionAmigos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Descripción"
-                android:textColor="#FFFFFF"
-                android:textColorHint="#777777"
+                android:hint="Tu nombre..."
+                android:textColor="#000"
+                android:textColorHint="#999"
+                android:textSize="14sp"
                 android:background="@null"/>
         </LinearLayout>
 
-        <!-- MARCA + PRESENTACION -->
+        <!-- TIPO DE DIA -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tipo de día"
+            android:textColor="#888888"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="6dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_input_purple"
+            android:padding="12dp"
+            android:layout_marginBottom="14dp">
+
+            <EditText
+                android:id="@+id/txtmarcaAmigos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Escuela, juego, paseo..."
+                android:textColor="#000"
+                android:textColorHint="#999"
+                android:textSize="14sp"
+                android:background="@null"/>
+        </LinearLayout>
+
+        <!-- DESCRIPCION DEL DIA -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="¿Qué hiciste hoy?"
+            android:textColor="#888888"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="6dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_input_purple"
+            android:padding="12dp"
+            android:layout_marginBottom="20dp">
+
+            <EditText
+                android:id="@+id/txtpresentacionAmigos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Cuéntame tu día..."
+                android:textColor="#000"
+                android:textColorHint="#999"
+                android:textSize="14sp"
+                android:minLines="3"
+                android:gravity="top"
+                android:background="@null"/>
+        </LinearLayout>
+
+        <!-- TARJETA EMOCIONES -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_card_fun"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="¿Cómo se calcula tu emoción?"
+                android:textColor="#FF9800"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="3">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_input_round"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:layout_marginEnd="6dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="😄"
+                        android:textSize="22sp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Más buenas"
+                        android:textColor="#388E3C"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:gravity="center"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_input_round"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:layout_marginEnd="6dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="😐"
+                        android:textSize="22sp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Parecidas"
+                        android:textColor="#666666"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:gravity="center"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_input_round"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="😢"
+                        android:textSize="22sp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Más difíciles"
+                        android:textColor="#D32F2F"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:gravity="center"/>
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- COSAS BUENAS Y DIFICULTADES -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="10dp">
+            android:weightSum="2"
+            android:layout_marginBottom="14dp">
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_input_purple"
-                android:padding="14dp"
-                android:layout_marginEnd="6dp">
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginEnd="8dp">
 
-                <EditText
-                    android:id="@+id/txtmarcaAmigos"
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Marca"
-                    android:textColor="#FFFFFF"
-                    android:textColorHint="#777777"
-                    android:background="@null"/>
+                    android:text="⭐ Cosas buenas"
+                    android:textColor="#888888"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_input_fun"
+                    android:padding="12dp">
+
+                    <EditText
+                        android:id="@+id/txtprecioAmigos"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="0"
+                        android:inputType="numberDecimal"
+                        android:textColor="#000"
+                        android:textColorHint="#999"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        android:background="@null"/>
+                </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_input_purple"
-                android:padding="14dp">
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-                <EditText
-                    android:id="@+id/txtpresentacionAmigos"
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Presentación"
-                    android:textColor="#FFFFFF"
-                    android:textColorHint="#777777"
-                    android:background="@null"/>
+                    android:text="🎯 Dificultades"
+                    android:textColor="#888888"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_input_fun"
+                    android:padding="12dp">
+
+                    <EditText
+                        android:id="@+id/txtcostoAmigos"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="0"
+                        android:inputType="numberDecimal"
+                        android:textColor="#000"
+                        android:textColorHint="#999"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        android:background="@null"/>
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 
-        <!-- PRECIO / COSTO / STOCK -->
+        <!-- CUANTAS VECES PASO -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🎈 ¿Cuántas veces pasó?"
+            android:textColor="#888888"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="6dp"/>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="16dp">
+            android:background="@drawable/bg_input_purple"
+            android:padding="12dp"
+            android:layout_marginBottom="20dp">
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
+            <EditText
+                android:id="@+id/txtstockAmigos"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_input_purple"
-                android:padding="12dp"
-                android:layout_marginEnd="6dp">
-
-                <EditText
-                    android:id="@+id/txtprecioAmigos"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Precio"
-                    android:inputType="numberDecimal"
-                    android:textColor="#FFFFFF"
-                    android:textColorHint="#777777"
-                    android:background="@null"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_input_purple"
-                android:padding="12dp"
-                android:layout_marginEnd="6dp">
-
-                <EditText
-                    android:id="@+id/txtcostoAmigos"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Costo"
-                    android:inputType="numberDecimal"
-                    android:textColor="#FFFFFF"
-                    android:textColorHint="#777777"
-                    android:background="@null"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_input_purple"
-                android:padding="12dp">
-
-                <EditText
-                    android:id="@+id/txtstockAmigos"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Stock"
-                    android:inputType="number"
-                    android:textColor="#FFFFFF"
-                    android:textColorHint="#777777"
-                    android:background="@null"/>
-            </LinearLayout>
+                android:hint="0"
+                android:inputType="number"
+                android:textColor="#000"
+                android:textColorHint="#999"
+                android:textSize="14sp"
+                android:background="@null"/>
         </LinearLayout>
+
+        <!-- CAMPO OCULTO -->
+        <EditText
+            android:id="@+id/txtcodigoAmigos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
 
         <!-- FOTO -->
         <ImageButton
             android:id="@+id/imgFotoAmigo"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
             android:background="@drawable/bg_foto_dashed_purple"
             android:src="@drawable/camara"
             android:scaleType="center"
-            android:contentDescription="foto"
-            app:tint="#B388FF"
+            app:tint="#FF9800"
             android:layout_marginBottom="20dp"/>
 
-        <!-- BOTON -->
-        <Button
-            android:id="@+id/btnGuardarAmigo"
+        <!-- HINT -->
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:text="Guardar producto"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#7C4DFF"
-            android:stateListAnimator="@null"/>
-
-        <!-- FAB -->
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabListaAmigo"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginTop="16dp"
-            android:src="@android:drawable/ic_media_previous"
-            app:tint="#B388FF"
-            app:backgroundTint="#1A1A2E"
-            app:borderWidth="0dp"/>
+            android:text="Tu emoción se calcula automáticamente"
+            android:textColor="#BBBBBB"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- BOTONES -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <Button
+                android:id="@+id/btnGuardarAmigo"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/bg_button_fun"
+                android:text="Guardar mi día"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"/>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabListaAmigo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_media_previous"
+                app:tint="#FFFFFF"
+                app:backgroundTint="#FF9800"
+                app:fabSize="mini"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 

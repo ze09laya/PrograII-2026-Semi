@@ -15,7 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -65,6 +65,17 @@ public class lista_producto extends Activity {
         fabRecargar.setOnClickListener(v -> {
             mostrarMsg("Actualizando...");
             obtenerProductos();
+        });
+
+        LinearLayout btnEstadisticas = findViewById(R.id.btnEstadisticas);
+        LinearLayout btnDibujo = findViewById(R.id.btnDibujo);
+
+        btnEstadisticas.setOnClickListener(v -> {
+            mostrarMsg("Abrir estadísticas");
+        });
+
+        btnDibujo.setOnClickListener(v -> {
+            mostrarMsg("Abrir dibujo");
         });
 
         obtenerProductos();
@@ -243,7 +254,7 @@ public class lista_producto extends Activity {
 
             jsonArray = new JSONArray();
 
-            // 🔥 INTENTA INTERNET PERO SIN ROMPER
+
             if (di.hayConexionInternet()) {
 
                 try {
@@ -259,12 +270,12 @@ public class lista_producto extends Activity {
                     }
 
                 } catch (Exception e) {
-                    // 🔥 SI FALLA INTERNET → USA LOCAL
+
                     cargarDesdeSQLite();
                 }
 
             } else {
-                // 🔥 SIN INTERNET → LOCAL
+
                 cargarDesdeSQLite();
             }
 

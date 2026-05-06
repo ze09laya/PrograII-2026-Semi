@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,8 +21,6 @@ import androidx.core.content.FileProvider;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.json.JSONObject;
-
-import android.widget.ImageButton;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -43,6 +42,8 @@ public class MainActivity extends Activity {
     String id = "";
     String rev = "";
     String urlFoto = "";
+
+    String emocion = ""; // ✅ CORREGIDO
 
     ArrayList<String> fotosTomadas = new ArrayList<>();
 
@@ -77,13 +78,13 @@ public class MainActivity extends Activity {
 
     private void menuImagenes() {
         String[] opciones = {
-                "Tomar nueva foto",
-                "Elegir de galería",
-                "Escoger foto tomada"
+                "Tomar foto 📸",
+                "Elegir de galería 🖼",
+                "Fotos guardadas 📁"
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Imagen");
+        builder.setTitle("Elige una imagen divertida 😊");
 
         builder.setItems(opciones, (d, which) -> {
             if (which == 0) tomarFoto();
@@ -192,7 +193,7 @@ public class MainActivity extends Activity {
             String costoStr = ((EditText)findViewById(R.id.txtcostoAmigos)).getText().toString().trim();
             String stockStr = ((EditText)findViewById(R.id.txtstockAmigos)).getText().toString().trim();
 
-            if (codigo.isEmpty() || descripcion.isEmpty() || marca.isEmpty()
+            if (descripcion.isEmpty() || marca.isEmpty()
                     || presentacion.isEmpty() || precioStr.isEmpty()
                     || costoStr.isEmpty() || stockStr.isEmpty()) {
                 mostrarMsg("Complete todos los campos");
@@ -200,16 +201,23 @@ public class MainActivity extends Activity {
             }
 
             if (urlFoto == null || urlFoto.isEmpty()) {
-                mostrarMsg("Seleccione imagen");
+                mostrarMsg("Selecciona una imagen 📸");
                 return;
             }
 
-            double precio = Double.parseDouble(precioStr);
-            double costo = Double.parseDouble(costoStr);
-            int stock = Integer.parseInt(stockStr);
+            double precio, costo;
+            int stock;
 
+            try {
+                precio = Double.parseDouble(precioStr);
+                costo = Double.parseDouble(costoStr);
+                stock = Integer.parseInt(stockStr);
+            } catch (Exception e) {
+                mostrarMsg("Solo números 😊");
+                return;
+            }
 
-            double ganancia = 0;
+            double ganancia;
 
             if (costo > 0 && precio > 0) {
                 ganancia = ((precio - costo) / costo) * 100;
@@ -217,6 +225,14 @@ public class MainActivity extends Activity {
                 ganancia = 0;
             }
 
+            // 🎯 EMOCIÓN PARA NIÑOS
+            if (ganancia >= 50) {
+                emocion = "😄";
+            } else if (ganancia >= 20) {
+                emocion = "😐";
+            } else {
+                emocion = "😢";
+            }
 
             detectarinternet di = new detectarinternet(this);
 
@@ -234,7 +250,8 @@ public class MainActivity extends Activity {
                     urlFoto,
                     String.valueOf(costo),
                     String.valueOf(stock),
-                    String.valueOf(ganancia)
+                    String.valueOf(ganancia),
+                    emocion // ✅ CORREGIDO
             };
 
             JSONObject json = new JSONObject();
@@ -256,7 +273,7 @@ public class MainActivity extends Activity {
 
             if (!di.hayConexionInternet()) {
                 db.administrar_amigos(accion, datos);
-                mostrarMsg("Guardado offline");
+                mostrarMsg("¡Guardado! 🎉");
                 regresarLista();
                 return;
             }
@@ -264,7 +281,7 @@ public class MainActivity extends Activity {
             enviarDatosServidor enviar = new enviarDatosServidor(this);
             enviar.execute(json.toString(), "POST", utilidades.url_mto);
 
-            mostrarMsg("Enviando al servidor...");
+            mostrarMsg("Enviando datos 🚀");
             regresarLista();
 
         } catch (Exception e) {
@@ -275,7 +292,7 @@ public class MainActivity extends Activity {
     private void elegirFotoTomada() {
 
         if (fotosTomadas.isEmpty()) {
-            mostrarMsg("No hay fotos");
+            mostrarMsg("No hay fotos 😢");
             return;
         }
 
@@ -286,7 +303,7 @@ public class MainActivity extends Activity {
         }
 
         new AlertDialog.Builder(this)
-                .setTitle("Escoger foto")
+                .setTitle("Escoge una foto 📁")
                 .setItems(lista, (d, which) -> {
                     urlFoto = fotosTomadas.get(which);
                     imgFoto.setImageBitmap(BitmapFactory.decodeFile(urlFoto));
@@ -317,7 +334,6 @@ public class MainActivity extends Activity {
             ((EditText)findViewById(R.id.txtcostoAmigos)).setText(datos.optString("costo"));
             ((EditText)findViewById(R.id.txtstockAmigos)).setText(datos.optString("stock"));
 
-
             urlFoto = datos.optString("foto");
 
             if (!urlFoto.isEmpty()) {
@@ -325,12 +341,12 @@ public class MainActivity extends Activity {
             }
 
         } catch (Exception e) {
-            mostrarMsg("Error cargar datos");
+            mostrarMsg("Error al cargar datos");
         }
     }
 
     private void regresarLista() {
-        startActivity(new Intent(this, MainActivity.class));
+        startActivity(new Intent(this, lista_producto.class)); // ✅ CORREGIDO
         finish();
     }
 

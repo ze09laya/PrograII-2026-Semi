@@ -40,10 +40,14 @@
 
         <activity android:name=".RegistroActivity"/>
 
+
+
         <activity
             android:name=".MainActivity"
             android:exported="true"/>
 
+        <activity android:name=".EstadisticasActivity"/>
+        <activity android:name=".DibujoActivity"/>
 
         <provider
             android:name="androidx.core.content.FileProvider"

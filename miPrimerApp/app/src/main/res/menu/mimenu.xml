@@ -2,24 +2,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-
     <item
         android:id="@+id/mnxAgregar"
-        android:title="➕ Agregar producto"
-        android:icon="@android:drawable/ic_menu_add"
+        android:title="★ Crear nuevo día"
+        android:icon="@android:drawable/ic_input_add"
         app:showAsAction="never" />
-
 
     <item
         android:id="@+id/mnxModificar"
-        android:title="✏️ Modificar producto"
+        android:title="✎ Cambiar mi día"
         android:icon="@android:drawable/ic_menu_edit"
         app:showAsAction="never" />
 
-
     <item
         android:id="@+id/mnxEliminar"
-        android:title="🗑 Eliminar producto"
+        android:title="✖ Quitar este día"
         android:icon="@android:drawable/ic_menu_delete"
         app:showAsAction="never" />
 

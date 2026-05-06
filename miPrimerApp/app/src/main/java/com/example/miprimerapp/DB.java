@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
 public class DB extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "producto.db";
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 7;
 
     private static final String SQLdb =
             "CREATE TABLE producto (" +
@@ -25,7 +25,8 @@ public class DB extends SQLiteOpenHelper {
                     "urlFoto TEXT, " +
                     "costo TEXT, " +
                     "stock TEXT, " +
-                    "ganancia TEXT)";
+                    "ganancia TEXT, " +
+                    "emocion TEXT)";
 
     private static final String SQLusuarios =
             "CREATE TABLE usuarios (" +
@@ -101,6 +102,7 @@ public class DB extends SQLiteOpenHelper {
                     valores.put("costo", datos[7]);
                     valores.put("stock", datos[8]);
                     valores.put("ganancia", datos[9]);
+                    valores.put("emocion", datos[10]);
 
                     db.insert("producto", null, valores);
                     break;
@@ -116,6 +118,7 @@ public class DB extends SQLiteOpenHelper {
                     valores.put("costo", datos[7]);
                     valores.put("stock", datos[8]);
                     valores.put("ganancia", datos[9]);
+                    valores.put("emocion", datos[10]);
 
                     db.update(
                             "producto",

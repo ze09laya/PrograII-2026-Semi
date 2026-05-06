@@ -92,6 +92,7 @@ public class AdaptadorProducto extends BaseAdapter {
     }
 
     private void mostrarGanancia(TextView textView, String gananciaStr) {
+
         double ganancia = 0.0;
 
         if (gananciaStr != null && !gananciaStr.trim().isEmpty()) {
@@ -102,6 +103,20 @@ public class AdaptadorProducto extends BaseAdapter {
             }
         }
 
-        textView.setText(String.format("Ganancia: %.2f%%", ganancia));
+        String emocion;
+        String estrellas;
+
+        if (ganancia >= 50) {
+            emocion = "😄 Muy feliz";
+            estrellas = "⭐⭐⭐";
+        } else if (ganancia >= 20) {
+            emocion = "🙂 Tranquilo";
+            estrellas = "⭐⭐";
+        } else {
+            emocion = "😢 Triste";
+            estrellas = "⭐";
+        }
+
+        textView.setText(emocion + " " + estrellas);
     }
 }
