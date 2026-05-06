@@ -21,6 +21,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.json.JSONObject;
 
+import android.widget.ImageButton;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -328,7 +330,7 @@ public class MainActivity extends Activity {
     }
 
     private void regresarLista() {
-        startActivity(new Intent(this, lista_producto.class));
+        startActivity(new Intent(this, MainActivity.class));
         finish();
     }
 

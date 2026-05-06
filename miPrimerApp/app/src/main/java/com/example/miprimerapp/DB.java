@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
 public class DB extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "producto.db";
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
 
     private static final String SQLdb =
             "CREATE TABLE producto (" +
@@ -27,19 +27,57 @@ public class DB extends SQLiteOpenHelper {
                     "stock TEXT, " +
                     "ganancia TEXT)";
 
+    private static final String SQLusuarios =
+            "CREATE TABLE usuarios (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "usuario TEXT, " +
+                    "password TEXT)";
+
+
     public DB(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQLdb);
+        db.execSQL(SQLusuarios); //
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS producto");
+        db.execSQL("DROP TABLE IF EXISTS usuarios"); //
         onCreate(db);
+    }
+
+
+    public void insertarUsuario(String usuario, String password) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues valores = new ContentValues();
+
+        valores.put("usuario", usuario);
+        valores.put("password", password);
+
+        db.insert("usuarios", null, valores);
+        db.close();
+    }
+
+    public boolean login(String usuario, String password) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM usuarios WHERE usuario=? AND password=?",
+                new String[]{usuario, password}
+        );
+
+        boolean existe = cursor.moveToFirst();
+        cursor.close();
+        db.close();
+
+        return existe;
     }
 
     public String administrar_amigos(String accion, String[] datos) {
@@ -115,5 +153,22 @@ public class DB extends SQLiteOpenHelper {
                 "SELECT * FROM producto",
                 null
         );
+    }
+
+    public boolean existeUsuario(String user) {
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM usuarios WHERE usuario=?",
+                new String[]{user}
+        );
+
+        boolean existe = cursor.moveToFirst();
+
+        cursor.close();
+        db.close();
+
+        return existe;
     }
 }

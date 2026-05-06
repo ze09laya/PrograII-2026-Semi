@@ -155,13 +155,13 @@ public class lista_producto extends Activity {
                             String id = value.optString("_id");
                             String rev = value.optString("_rev");
 
-                            // 🔴 1. BORRAR LOCAL (SQLite)
+
                             db.administrar_amigos(
                                     "eliminar",
                                     new String[]{idProducto}
                             );
 
-                            // 🔥 2. BORRAR EN COUCHDB (IMPORTANTE)
+
                             JSONObject json = new JSONObject();
                             json.put("_id", id);
                             json.put("_rev", rev);
@@ -243,50 +243,74 @@ public class lista_producto extends Activity {
 
             jsonArray = new JSONArray();
 
+            // 🔥 INTENTA INTERNET PERO SIN ROMPER
             if (di.hayConexionInternet()) {
 
-                datosServidor = new obtenerDatosServidor();
-                String resp = datosServidor.execute().get();
+                try {
 
-                JSONObject jsonObject = new JSONObject(resp);
-                jsonArray = jsonObject.getJSONArray("rows");
+                    datosServidor = new obtenerDatosServidor();
+                    String resp = datosServidor.execute().get();
+
+                    if (resp != null && !resp.contains("error")) {
+                        JSONObject jsonObject = new JSONObject(resp);
+                        jsonArray = jsonObject.getJSONArray("rows");
+                    } else {
+                        cargarDesdeSQLite();
+                    }
+
+                } catch (Exception e) {
+                    // 🔥 SI FALLA INTERNET → USA LOCAL
+                    cargarDesdeSQLite();
+                }
 
             } else {
-
-                cursor = db.lista_amigos();
-
-                if (cursor.moveToFirst()) {
-
-                    do {
-
-                        JSONObject fila = new JSONObject();
-                        JSONObject value = new JSONObject();
-
-                        value.put("idProducto", cursor.getString(1));
-                        value.put("codigo", cursor.getString(2));
-                        value.put("descripcion", cursor.getString(3));
-                        value.put("marca", cursor.getString(4));
-                        value.put("presentacion", cursor.getString(5));
-                        value.put("precio", cursor.getString(6));
-                        value.put("foto", cursor.getString(7));
-                        value.put("costo", cursor.getString(8));
-                        value.put("stock", cursor.getString(9));
-                        value.put("ganancia", cursor.getString(10));
-
-                        fila.put("value", value);
-                        jsonArray.put(fila);
-
-                    } while (cursor.moveToNext());
-                }
+                // 🔥 SIN INTERNET → LOCAL
+                cargarDesdeSQLite();
             }
 
             mostrarProductos();
 
         } catch (Exception e) {
-            mostrarMsg("Error cargar datos");
+            mostrarMsg("Error cargar datos: " + e.getMessage());
         }
     }
 
+
+
+    private void cargarDesdeSQLite() {
+
+        try {
+
+            cursor = db.lista_amigos();
+
+            if (cursor.moveToFirst()) {
+
+                do {
+
+                    JSONObject fila = new JSONObject();
+                    JSONObject value = new JSONObject();
+
+                    value.put("idProducto", cursor.getString(1));
+                    value.put("codigo", cursor.getString(2));
+                    value.put("descripcion", cursor.getString(3));
+                    value.put("marca", cursor.getString(4));
+                    value.put("presentacion", cursor.getString(5));
+                    value.put("precio", cursor.getString(6));
+                    value.put("foto", cursor.getString(7));
+                    value.put("costo", cursor.getString(8));
+                    value.put("stock", cursor.getString(9));
+                    value.put("ganancia", cursor.getString(10));
+
+                    fila.put("value", value);
+                    jsonArray.put(fila);
+
+                } while (cursor.moveToNext());
+            }
+
+        } catch (Exception e) {
+            mostrarMsg("Error SQLite: " + e.getMessage());
+        }
+    }
 
 
     private void mostrarProductos() {
