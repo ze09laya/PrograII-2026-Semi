@@ -10,7 +10,7 @@ import android.widget.Toast;
 public class LoginActivity extends Activity {
 
     EditText txtUsuario, txtPassword;
-    Button btnLogin, btnIrRegistro; // 👈 agrega aquí
+    Button btnLogin, btnIrRegistro;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +24,7 @@ public class LoginActivity extends Activity {
 
         btnLogin.setOnClickListener(v -> validarLogin());
 
-        // 🔥 ESTE ES EL QUE PREGUNTAS
+
         btnIrRegistro.setOnClickListener(v -> {
             startActivity(new Intent(this, RegistroActivity.class));
         });

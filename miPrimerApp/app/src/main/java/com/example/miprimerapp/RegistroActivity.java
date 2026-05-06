@@ -24,10 +24,10 @@ public class RegistroActivity extends Activity {
         btnRegistrar = findViewById(R.id.btnRegistrar);
         btnVolver = findViewById(R.id.btnVolverLogin);
 
-        // 🔥 BOTÓN REGISTRAR
+
         btnRegistrar.setOnClickListener(v -> registrar());
 
-        // 🔥 BOTÓN VOLVER (AQUÍ VA, NO EN registrar)
+
         btnVolver.setOnClickListener(v -> finish());
     }
 
@@ -41,13 +41,13 @@ public class RegistroActivity extends Activity {
             return;
         }
 
-        // 🔥 VALIDAR SI YA EXISTE
+
         if (db.existeUsuario(user)) {
             Toast.makeText(this, "Usuario ya existe", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 🔥 GUARDAR
+
         db.insertarUsuario(user, pass);
 
         Toast.makeText(this, "Usuario creado", Toast.LENGTH_SHORT).show();
