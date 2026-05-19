@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#12052A"
+    android:padding="12dp">
+
+    <!-- TITULO -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🎨 Mis Dibujos"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:textSize="24sp"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- BUSCADOR -->
+    <EditText
+        android:id="@+id/txtBuscar"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:hint="Buscar dibujo..."
+        android:textColor="#FFFFFF"
+        android:textColorHint="#B39DDB"
+        android:padding="12dp"
+        android:background="@drawable/bg_input_round"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- GRID -->
+    <GridView
+        android:id="@+id/gridDibujos"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:numColumns="2"
+        android:verticalSpacing="10dp"
+        android:horizontalSpacing="10dp"
+        android:stretchMode="columnWidth"/>
+
+</LinearLayout>

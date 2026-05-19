@@ -15,7 +15,9 @@ public class producto {
 
     private String ganancia;
 
-    public producto(String idProducto, String codigo, String descripcion, String marca, String presentacion, String precio, String foto, String costo, String stock, String ganancia) {
+    private String emocion;
+
+    public producto(String idProducto, String codigo, String descripcion, String marca, String presentacion, String precio, String foto, String costo, String stock, String ganancia, String emocion) {
         this.idProducto = idProducto;
         this.codigo = codigo;
         this.descripcion = descripcion;
@@ -26,6 +28,7 @@ public class producto {
         this.costo = costo;
         this.stock = stock;
         this. ganancia= ganancia;
+        this. emocion= emocion;
 
 
     }
@@ -109,4 +112,12 @@ public class producto {
         this.ganancia = ganancia;
     }
 
+
+
+    public String getEmocion() {
+        return emocion;
+    }
+    public void setEmocion(String emocion) {
+        this.emocion = emocion;
+    }
 }

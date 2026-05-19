@@ -225,7 +225,7 @@ public class MainActivity extends Activity {
                 ganancia = 0;
             }
 
-            // 🎯 EMOCIÓN PARA NIÑOS
+
             if (ganancia >= 50) {
                 emocion = "😄";
             } else if (ganancia >= 20) {
@@ -346,7 +346,7 @@ public class MainActivity extends Activity {
     }
 
     private void regresarLista() {
-        startActivity(new Intent(this, lista_producto.class)); // ✅ CORREGIDO
+        startActivity(new Intent(this, lista_producto.class));
         finish();
     }
 

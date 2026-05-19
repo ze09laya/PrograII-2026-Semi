@@ -67,15 +67,20 @@ public class lista_producto extends Activity {
             obtenerProductos();
         });
 
+        // BOTONES NUEVOS
         LinearLayout btnEstadisticas = findViewById(R.id.btnEstadisticas);
         LinearLayout btnDibujo = findViewById(R.id.btnDibujo);
 
+        // ABRIR ESTADISTICAS
         btnEstadisticas.setOnClickListener(v -> {
-            mostrarMsg("Abrir estadísticas");
+            Intent i = new Intent(lista_producto.this, EstadisticasActivity.class);
+            startActivity(i);
         });
 
+        // ABRIR DIBUJO
         btnDibujo.setOnClickListener(v -> {
-            mostrarMsg("Abrir dibujo");
+            Intent i = new Intent(lista_producto.this, DibujoActivity.class);
+            startActivity(i);
         });
 
         obtenerProductos();
@@ -348,7 +353,8 @@ public class lista_producto extends Activity {
                         value.optString("foto"),
                         value.optString("costo"),
                         value.optString("stock"),
-                        value.optString("ganancia")
+                        value.optString("ganancia"),
+                        value.optString("emocion")
                 );
 
                 listaProductos.add(p);
