@@ -2,6 +2,7 @@ package com.example.miprimerapp;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -11,10 +12,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.FileOutputStream;
+
+
 
 public class DibujoActivity extends Activity {
 
@@ -32,6 +33,8 @@ public class DibujoActivity extends Activity {
 
     int cantidadDibujos = 0;
 
+    boolean guardando = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -40,257 +43,138 @@ public class DibujoActivity extends Activity {
 
         db = new DB(this);
 
-        // CONTENEDOR
         FrameLayout contenedor =
                 findViewById(R.id.contenedorLienzo);
 
-        // BOTONES
-        btnGuardar =
-                findViewById(R.id.btnGuardar);
+        btnGuardar = findViewById(R.id.btnGuardar);
+        btnLimpiar = findViewById(R.id.btnLimpiar);
+        btnSalir = findViewById(R.id.btnSalir);
+        btnVerDibujos = findViewById(R.id.btnVerDibujos);
 
-        btnLimpiar =
-                findViewById(R.id.btnLimpiar);
+        txtDibujos = findViewById(R.id.txtDibujos);
+        txtArtista = findViewById(R.id.txtArtista);
 
-        btnSalir =
-                findViewById(R.id.btnSalir);
-
-        btnVerDibujos =
-                findViewById(R.id.btnVerDibujos);
-
-        // TEXTOS
-        txtDibujos =
-                findViewById(R.id.txtDibujos);
-
-        txtArtista =
-                findViewById(R.id.txtArtista);
-
-        // CREAR LIENZO
         lienzo = new Lienzo(this);
-
         contenedor.addView(lienzo);
 
-        // TOTAL DIBUJOS
-        cantidadDibujos =
-                db.obtenerDibujos().getCount();
+        actualizarDatos();
 
-        txtDibujos.setText(
-                "♥ " + cantidadDibujos + " dibujos"
-        );
-
-        actualizarNivel();
-
-        // LIMPIAR
         btnLimpiar.setOnClickListener(v -> {
             lienzo.limpiar();
+            Toast.makeText(this, "Lienzo limpiado 🧹", Toast.LENGTH_SHORT).show();
         });
 
-        // SALIR
-        btnSalir.setOnClickListener(v -> {
-            finish();
-        });
+        btnSalir.setOnClickListener(v -> finish());
 
-        // GUARDAR
         btnGuardar.setOnClickListener(v -> {
-            guardarDibujo();
+            if (!guardando) guardarDibujo();
         });
 
-        // VER DIBUJOS
         btnVerDibujos.setOnClickListener(v -> {
-
-            Intent i = new Intent(
-                    DibujoActivity.this,
-                    ListaDibujosActivity.class
-            );
-
-            startActivity(i);
+            startActivity(new Intent(this, ListaDibujosActivity.class));
         });
 
-        // COLORES
         findViewById(R.id.colorRojo)
-                .setOnClickListener(v ->
-                        lienzo.cambiarColor(
-                                Color.parseColor("#F44336")
-                        ));
+                .setOnClickListener(v -> lienzo.cambiarColor(Color.parseColor("#F44336")));
 
         findViewById(R.id.colorNaranja)
-                .setOnClickListener(v ->
-                        lienzo.cambiarColor(
-                                Color.parseColor("#FF9800")
-                        ));
+                .setOnClickListener(v -> lienzo.cambiarColor(Color.parseColor("#FF9800")));
 
         findViewById(R.id.colorAmarillo)
-                .setOnClickListener(v ->
-                        lienzo.cambiarColor(
-                                Color.parseColor("#FFD600")
-                        ));
+                .setOnClickListener(v -> lienzo.cambiarColor(Color.parseColor("#FFD600")));
 
         findViewById(R.id.colorVerde)
-                .setOnClickListener(v ->
-                        lienzo.cambiarColor(
-                                Color.parseColor("#4CAF50")
-                        ));
+                .setOnClickListener(v -> lienzo.cambiarColor(Color.parseColor("#4CAF50")));
 
         findViewById(R.id.colorMorado)
-                .setOnClickListener(v ->
-                        lienzo.cambiarColor(
-                                Color.parseColor("#7C4DFF")
-                        ));
+                .setOnClickListener(v -> lienzo.cambiarColor(Color.parseColor("#7C4DFF")));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        actualizarDatos();
+    }
+
+    private void actualizarDatos() {
+
+        Cursor cursor = db.obtenerDibujos();
+
+        cantidadDibujos = cursor.getCount();
+
+        cursor.close();
+
+        txtDibujos.setText("♥ " + cantidadDibujos + " dibujos");
+
+        actualizarNivel();
     }
 
     private void guardarDibujo() {
 
         try {
 
-            if (lienzo == null) {
-
-                Toast.makeText(
-                        this,
-                        "No hay lienzo",
-                        Toast.LENGTH_LONG
-                ).show();
-
+            if (!lienzo.hayDibujo()) {
+                Toast.makeText(this, "Dibuja algo primero 🎨", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // CREAR BITMAP
-            lienzo.setDrawingCacheEnabled(true);
+            guardando = true;
 
-            Bitmap bitmap =
-                    Bitmap.createBitmap(
-                            lienzo.getDrawingCache()
-                    );
+            Bitmap bitmap = Bitmap.createBitmap(
+                    lienzo.getWidth(),
+                    lienzo.getHeight(),
+                    Bitmap.Config.ARGB_8888
+            );
 
-            lienzo.setDrawingCacheEnabled(false);
+            android.graphics.Canvas canvas = new android.graphics.Canvas(bitmap);
+            lienzo.draw(canvas);
 
-            // CARPETA
-            File carpeta =
-                    getExternalFilesDir(
-                            Environment.DIRECTORY_PICTURES
-                    );
+            File carpeta = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
-            if (carpeta != null &&
-                    !carpeta.exists()) {
-
-                carpeta.mkdirs();
+            if (carpeta == null) {
+                guardando = false;
+                return;
             }
 
-            // NOMBRE ARCHIVO
-            String nombre =
-                    "dibujo_" +
-                            System.currentTimeMillis()
-                            + ".png";
+            if (!carpeta.exists()) carpeta.mkdirs();
 
-            File archivo =
-                    new File(carpeta, nombre);
+            File archivo = new File(carpeta,
+                    "dibujo_" + System.currentTimeMillis() + ".png");
 
-            // GUARDAR PNG
-            FileOutputStream output =
-                    new FileOutputStream(archivo);
+            FileOutputStream output = new FileOutputStream(archivo);
 
-            bitmap.compress(
-                    Bitmap.CompressFormat.PNG,
-                    100,
-                    output
-            );
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, output);
 
             output.flush();
             output.close();
 
-            // GUARDAR EN SQLITE
-            db.guardarDibujo(
-                    archivo.getAbsolutePath()
-            );
+            db.guardarDibujo(archivo.getAbsolutePath());
 
-            // ACTUALIZAR CONTADOR
-            cantidadDibujos =
-                    db.obtenerDibujos().getCount();
+            actualizarDatos();
 
-            txtDibujos.setText(
-                    "♥ " +
-                            cantidadDibujos +
-                            " dibujos"
-            );
+            lienzo.limpiar();
 
-            actualizarNivel();
+            Toast.makeText(this, "Guardado 🎨", Toast.LENGTH_SHORT).show();
 
-            // INTERNET
-            detectarinternet di =
-                    new detectarinternet(this);
-
-            if (di.hayConexionInternet()) {
-
-                try {
-
-                    JSONObject json =
-                            new JSONObject();
-
-                    json.put(
-                            "tipo",
-                            "dibujo"
-                    );
-
-                    json.put(
-                            "ruta",
-                            archivo.getAbsolutePath()
-                    );
-
-                    enviarDatosServidor enviar =
-                            new enviarDatosServidor(this);
-
-                    enviar.execute(
-                            json.toString(),
-                            "POST",
-                            utilidades.url_mto
-                    );
-
-                } catch (Exception e) {
-
-                    e.printStackTrace();
-                }
-            }
-
-            Toast.makeText(
-                    this,
-                    "Dibujo guardado 🎨",
-                    Toast.LENGTH_LONG
-            ).show();
+            guardando = false;
 
         } catch (Exception e) {
 
-            Toast.makeText(
-                    this,
-                    "Error: " + e.getMessage(),
-                    Toast.LENGTH_LONG
-            ).show();
+            guardando = false;
+
+            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
-    // NIVEL ARTISTA
     private void actualizarNivel() {
 
-        if (cantidadDibujos >= 15) {
-
-            txtArtista.setText(
-                    "🏆 Maestro artista"
-            );
-
-        } else if (cantidadDibujos >= 10) {
-
-            txtArtista.setText(
-                    "⭐⭐ Super artista"
-            );
-
-        } else if (cantidadDibujos >= 5) {
-
-            txtArtista.setText(
-                    "⭐ Gran artista"
-            );
-
-        } else {
-
-            txtArtista.setText(
-                    "★ Artista novato"
-            );
-        }
+        if (cantidadDibujos >= 20) txtArtista.setText("👑 Leyenda");
+        else if (cantidadDibujos >= 15) txtArtista.setText("🏆 Maestro");
+        else if (cantidadDibujos >= 10) txtArtista.setText("⭐⭐ Pro");
+        else if (cantidadDibujos >= 5) txtArtista.setText("⭐ Medio");
+        else txtArtista.setText("★ Novato");
     }
+
+
+
 }

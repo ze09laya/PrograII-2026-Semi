@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,7 +19,9 @@ import java.util.ArrayList;
 public class AdaptadorDibujos extends BaseAdapter {
 
     Context context;
+
     ArrayList<String> dibujos;
+
     DB db;
 
     public AdaptadorDibujos(
@@ -27,22 +30,27 @@ public class AdaptadorDibujos extends BaseAdapter {
     ) {
 
         this.context = context;
+
         this.dibujos = dibujos;
+
         db = new DB(context);
     }
 
     @Override
     public int getCount() {
+
         return dibujos.size();
     }
 
     @Override
     public Object getItem(int position) {
+
         return dibujos.get(position);
     }
 
     @Override
     public long getItemId(int position) {
+
         return position;
     }
 
@@ -53,12 +61,13 @@ public class AdaptadorDibujos extends BaseAdapter {
             ViewGroup parent
     ) {
 
-        View vista = LayoutInflater.from(context)
-                .inflate(
-                        R.layout.item_dibujo,
-                        parent,
-                        false
-                );
+        View vista =
+                LayoutInflater.from(context)
+                        .inflate(
+                                R.layout.item_dibujo,
+                                parent,
+                                false
+                        );
 
         ImageView img =
                 vista.findViewById(R.id.imgDibujo);
@@ -72,14 +81,27 @@ public class AdaptadorDibujos extends BaseAdapter {
         Button btnEditar =
                 vista.findViewById(R.id.btnEditar);
 
-        String ruta = dibujos.get(position);
+        String ruta =
+                dibujos.get(position);
 
-        img.setImageBitmap(
-                BitmapFactory.decodeFile(ruta)
-        );
+        File archivo =
+                new File(ruta);
 
-        File archivo = new File(ruta);
+        // VALIDAR EXISTE
+        if (archivo.exists()) {
 
+            img.setImageBitmap(
+                    BitmapFactory.decodeFile(ruta)
+            );
+
+        } else {
+
+            img.setImageResource(
+                    android.R.drawable.ic_menu_report_image
+            );
+        }
+
+        // NOMBRE
         txtNombre.setText(
                 archivo.getName()
         );
@@ -87,11 +109,58 @@ public class AdaptadorDibujos extends BaseAdapter {
         // ELIMINAR
         btnEliminar.setOnClickListener(v -> {
 
-            archivo.delete();
+            new AlertDialog.Builder(context)
 
-            dibujos.remove(position);
+                    .setTitle("Eliminar")
 
-            notifyDataSetChanged();
+                    .setMessage(
+                            "¿Deseas eliminar este dibujo?"
+                    )
+
+                    .setPositiveButton(
+                            "Sí",
+                            (dialog, which) -> {
+
+                                try {
+
+                                    // BORRAR ARCHIVO
+                                    if (archivo.exists()) {
+
+                                        archivo.delete();
+                                    }
+
+                                    // BORRAR SQLITE
+                                    db.eliminarDibujo(ruta);
+
+                                    // BORRAR LISTA
+                                    dibujos.remove(position);
+
+                                    // ACTUALIZAR
+                                    notifyDataSetChanged();
+
+                                    Toast.makeText(
+                                            context,
+                                            "Dibujo eliminado 🗑",
+                                            Toast.LENGTH_SHORT
+                                    ).show();
+
+                                } catch (Exception e) {
+
+                                    Toast.makeText(
+                                            context,
+                                            "Error eliminando",
+                                            Toast.LENGTH_SHORT
+                                    ).show();
+                                }
+                            }
+                    )
+
+                    .setNegativeButton(
+                            "Cancelar",
+                            null
+                    )
+
+                    .show();
         });
 
         // EDITAR
@@ -105,7 +174,10 @@ public class AdaptadorDibujos extends BaseAdapter {
             EditText txt =
                     new EditText(context);
 
-            txt.setText(archivo.getName());
+            txt.setText(
+                    archivo.getName()
+                            .replace(".png", "")
+            );
 
             builder.setView(txt);
 
@@ -113,23 +185,77 @@ public class AdaptadorDibujos extends BaseAdapter {
                     "Guardar",
                     (dialog, which) -> {
 
-                        String nuevo =
-                                txt.getText().toString();
+                        try {
 
-                        File nuevoArchivo =
-                                new File(
-                                        archivo.getParent(),
-                                        nuevo + ".png"
+                            String nuevo =
+                                    txt.getText()
+                                            .toString()
+                                            .trim();
+
+                            // VALIDAR
+                            if (nuevo.isEmpty()) {
+
+                                Toast.makeText(
+                                        context,
+                                        "Nombre vacío",
+                                        Toast.LENGTH_SHORT
+                                ).show();
+
+                                return;
+                            }
+
+                            File nuevoArchivo =
+                                    new File(
+                                            archivo.getParent(),
+                                            nuevo + ".png"
+                                    );
+
+                            // RENOMBRAR
+                            boolean renombrado =
+                                    archivo.renameTo(
+                                            nuevoArchivo
+                                    );
+
+                            if (renombrado) {
+
+                                // SQLITE
+                                db.eliminarDibujo(ruta);
+
+                                db.guardarDibujo(
+                                        nuevoArchivo.getAbsolutePath()
                                 );
 
-                        archivo.renameTo(nuevoArchivo);
+                                // ACTUALIZAR LISTA
+                                dibujos.set(
+                                        position,
+                                        nuevoArchivo.getAbsolutePath()
+                                );
 
-                        dibujos.set(
-                                position,
-                                nuevoArchivo.getAbsolutePath()
-                        );
+                                notifyDataSetChanged();
 
-                        notifyDataSetChanged();
+                                Toast.makeText(
+                                        context,
+                                        "Nombre actualizado ✏",
+                                        Toast.LENGTH_SHORT
+                                ).show();
+
+                            } else {
+
+                                Toast.makeText(
+                                        context,
+                                        "No se pudo editar",
+                                        Toast.LENGTH_SHORT
+                                ).show();
+                            }
+
+                        } catch (Exception e) {
+
+                            Toast.makeText(
+                                    context,
+                                    "Error editando",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                        }
                     }
             );
 

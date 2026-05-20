@@ -298,4 +298,23 @@ public class DB extends SQLiteOpenHelper {
                 null
         );
     }
+
+
+
+
+
+    // ELIMINAR DIBUJO
+    public void eliminarDibujo(String ruta) {
+
+        SQLiteDatabase db =
+                getWritableDatabase();
+
+        db.delete(
+                "dibujos",
+                "rutaDibujo=?",
+                new String[]{ruta}
+        );
+
+        db.close();
+    }
 }

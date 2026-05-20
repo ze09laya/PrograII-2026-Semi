@@ -1,5 +1,5 @@
 package com.example.miprimerapp;
-
+import java.io.File;
 import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -88,51 +88,57 @@ public class ListaDibujosActivity extends Activity {
     private void cargarDibujos() {
 
         dibujos.clear();
+        dibujosOriginal.clear(); // 🔥 IMPORTANTE
 
-        dibujosOriginal.clear();
-
-        Cursor cursor =
-                db.obtenerDibujos();
+        Cursor cursor = db.obtenerDibujos();
 
         while (cursor.moveToNext()) {
 
-            String ruta =
-                    cursor.getString(
-                            cursor.getColumnIndexOrThrow(
-                                    "rutaDibujo"
-                            )
-                    );
+            String ruta = cursor.getString(
+                    cursor.getColumnIndexOrThrow("rutaDibujo")
+            );
 
-            dibujos.add(ruta);
+            File archivo = new File(ruta);
 
-            dibujosOriginal.add(ruta);
+            // SOLO SI EXISTE
+            if (archivo.exists()) {
+
+                dibujos.add(ruta);
+                dibujosOriginal.add(ruta); // 🔥 COPIA REAL
+
+            } else {
+
+                db.eliminarDibujo(ruta);
+            }
         }
 
         cursor.close();
 
-        adaptador =
-                new AdaptadorDibujos(
-                        this,
-                        dibujos
-                );
-
-        gridDibujos.setAdapter(
-                adaptador
-        );
+        adaptador = new AdaptadorDibujos(this, dibujos);
+        gridDibujos.setAdapter(adaptador);
     }
 
     private void filtrar(String texto) {
 
         dibujos.clear();
 
-        for (String ruta : dibujosOriginal) {
+        if (texto == null || texto.trim().isEmpty()) {
 
-            if (ruta.toLowerCase()
-                    .contains(
-                            texto.toLowerCase()
-                    )) {
+            dibujos.addAll(dibujosOriginal);
 
-                dibujos.add(ruta);
+        } else {
+
+            String filtro = texto.toLowerCase();
+
+            for (String ruta : dibujosOriginal) {
+
+                File archivo = new File(ruta);
+
+                String nombre = archivo.getName().toLowerCase();
+
+                if (nombre.contains(filtro)) {
+                    dibujos.add(ruta);
+                }
             }
         }
 
