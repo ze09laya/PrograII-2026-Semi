@@ -317,4 +317,31 @@ public class DB extends SQLiteOpenHelper {
 
         db.close();
     }
+
+
+
+
+
+
+    public Cursor obtenerAmigos() {
+
+        SQLiteDatabase database =
+                this.getReadableDatabase();
+
+        return database.rawQuery(
+                "SELECT * FROM producto",
+                null
+        );
+    }
+
+    public Cursor obtenerDatos() {
+
+        SQLiteDatabase db =
+                this.getReadableDatabase();
+
+        return db.rawQuery(
+                "SELECT * FROM producto",
+                null
+        );
+    }
 }
