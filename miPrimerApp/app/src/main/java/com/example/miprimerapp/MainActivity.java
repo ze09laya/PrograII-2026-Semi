@@ -502,36 +502,14 @@ public class MainActivity extends Activity {
     }
 
     private void guardarProducto() {
-
         try {
-
-            String codigo =
-                    txtCodigo.getText()
-                            .toString().trim();
-
-            String descripcion =
-                    txtDescripcion.getText()
-                            .toString().trim();
-
-            String marca =
-                    txtMarca.getText()
-                            .toString().trim();
-
-            String presentacion =
-                    txtPresentacion.getText()
-                            .toString().trim();
-
-            String precioStr =
-                    txtPrecio.getText()
-                            .toString().trim();
-
-            String costoStr =
-                    txtCosto.getText()
-                            .toString().trim();
-
-            String stockStr =
-                    txtStock.getText()
-                            .toString().trim();
+            String codigo = txtCodigo.getText().toString().trim();
+            String descripcion = txtDescripcion.getText().toString().trim();
+            String marca = txtMarca.getText().toString().trim();
+            String presentacion = txtPresentacion.getText().toString().trim();
+            String precioStr = txtPrecio.getText().toString().trim();
+            String costoStr = txtCosto.getText().toString().trim();
+            String stockStr = txtStock.getText().toString().trim();
 
             if (descripcion.isEmpty()
                     || marca.isEmpty()
@@ -540,61 +518,41 @@ public class MainActivity extends Activity {
                     || costoStr.isEmpty()
                     || stockStr.isEmpty()) {
 
-                mostrarMsg(
-                        "Complete todos los campos"
-                );
-
+                mostrarMsg("Complete todos los campos");
                 return;
             }
 
-            if (urlFoto == null
-                    || urlFoto.isEmpty()) {
-
-                mostrarMsg(
-                        "Selecciona una imagen 📸"
-                );
-
+            if (urlFoto == null || urlFoto.isEmpty()) {
+                mostrarMsg("Selecciona una imagen 📸");
                 return;
             }
 
-            double precio =
-                    Double.parseDouble(precioStr);
-
-            double costo =
-                    Double.parseDouble(costoStr);
-
-            int stock =
-                    Integer.parseInt(stockStr);
+            double precio = Double.parseDouble(precioStr);
+            double costo = Double.parseDouble(costoStr);
+            int stock = Integer.parseInt(stockStr);
 
             double ganancia;
 
-            if (costo > 0 && precio > 0) {
-
-                ganancia =
-                        ((precio - costo)
-                                / costo) * 100;
-
+            // CORRECCIÓN 1: Manejo de Costo 0 (Día sin dificultades)
+            if (costo > 0) {
+                ganancia = ((precio - costo) / costo) * 100;
+            } else if (precio > 0) {
+                // Si tuvo cosas buenas (precio) y 0 dificultades (costo), es un día excelente
+                ganancia = 100;
             } else {
-
                 ganancia = 0;
             }
 
-            // EMOCION
+            // ASIGNAR EMOCION
             if (ganancia >= 50) {
-
                 emocion = "😄";
-
             } else if (ganancia >= 20) {
-
                 emocion = "😐";
-
             } else {
-
                 emocion = "😢";
             }
 
             if (idProducto.isEmpty()) {
-
                 idProducto = generarId();
             }
 
@@ -612,101 +570,49 @@ public class MainActivity extends Activity {
                     emocion
             };
 
-            detectarinternet di =
-                    new detectarinternet(this);
+            // CORRECCIÓN 2: Guardar en la base de datos local del teléfono SIEMPRE
+            db.administrar_amigos(accion, datos);
 
-            JSONObject json =
-                    new JSONObject();
-
-            json.put(
-                    "idProducto",
-                    idProducto
-            );
-
-            json.put(
-                    "codigo",
-                    codigo
-            );
-
-            json.put(
-                    "descripcion",
-                    descripcion
-            );
-
-            json.put(
-                    "marca",
-                    marca
-            );
-
-            json.put(
-                    "presentacion",
-                    presentacion
-            );
-
-            json.put(
-                    "precio",
-                    precio
-            );
-
-            json.put(
-                    "foto",
-                    urlFoto
-            );
-
-            json.put(
-                    "costo",
-                    costo
-            );
-
-            json.put(
-                    "stock",
-                    stock
-            );
-
-            json.put(
-                    "ganancia",
-                    ganancia
-            );
+            // Preparamos el objeto JSON por si hay que enviarlo a la nube
+            JSONObject json = new JSONObject();
+            json.put("idProducto", idProducto);
+            json.put("codigo", codigo);
+            json.put("descripcion", descripcion);
+            json.put("marca", marca);
+            json.put("presentacion", presentacion);
+            json.put("precio", precio);
+            json.put("foto", urlFoto);
+            json.put("costo", costo);
+            json.put("stock", stock);
+            json.put("ganancia", ganancia);
 
             if (accion.equals("modificar")) {
-
                 json.put("_id", id);
-
                 json.put("_rev", rev);
             }
 
+            detectarinternet di = new detectarinternet(this);
+
             if (!di.hayConexionInternet()) {
-
-                db.administrar_amigos(
-                        accion,
-                        datos
-                );
-
-                mostrarMsg("¡Guardado! 🎉");
-
+                // Si no hay internet, el flujo termina aquí ya habiendo guardado localmente
+                mostrarMsg("¡Guardado en el dispositivo! 🎉");
                 regresarLista();
-
                 return;
             }
 
-            enviarDatosServidor enviar =
-                    new enviarDatosServidor(this);
-
+            // Si SÍ hay internet, además de haber guardado en el teléfono, lo sube al servidor
+            enviarDatosServidor enviar = new enviarDatosServidor(this);
             enviar.execute(
                     json.toString(),
                     "POST",
                     utilidades.url_mto
             );
 
-            mostrarMsg("Enviando datos 🚀");
-
+            mostrarMsg("¡Guardado y Sincronizado en la nube! 🚀");
             regresarLista();
 
         } catch (Exception e) {
-
-            mostrarMsg(
-                    "Error: " + e.getMessage()
-            );
+            mostrarMsg("Error: " + e.getMessage());
         }
     }
 

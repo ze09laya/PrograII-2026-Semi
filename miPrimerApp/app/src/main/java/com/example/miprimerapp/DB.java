@@ -300,10 +300,6 @@ public class DB extends SQLiteOpenHelper {
     }
 
 
-
-
-
-    // ELIMINAR DIBUJO
     public void eliminarDibujo(String ruta) {
 
         SQLiteDatabase db =
@@ -323,6 +319,7 @@ public class DB extends SQLiteOpenHelper {
 
 
 
+
     public Cursor obtenerAmigos() {
 
         SQLiteDatabase database =
@@ -333,6 +330,10 @@ public class DB extends SQLiteOpenHelper {
                 null
         );
     }
+
+
+
+
 
     public Cursor obtenerDatos() {
 
