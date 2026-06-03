@@ -88,7 +88,7 @@ public class ListaDibujosActivity extends Activity {
     private void cargarDibujos() {
 
         dibujos.clear();
-        dibujosOriginal.clear(); // 🔥 IMPORTANTE
+        dibujosOriginal.clear();
 
         Cursor cursor = db.obtenerDibujos();
 
@@ -104,7 +104,7 @@ public class ListaDibujosActivity extends Activity {
             if (archivo.exists()) {
 
                 dibujos.add(ruta);
-                dibujosOriginal.add(ruta); // 🔥 COPIA REAL
+                dibujosOriginal.add(ruta);
 
             } else {
 

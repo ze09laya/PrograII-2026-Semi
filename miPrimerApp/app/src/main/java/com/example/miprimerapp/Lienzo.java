@@ -6,20 +6,35 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 
 public class Lienzo extends View {
 
-    private Paint paint = new Paint();
+    private Paint paint;
+    private Path path;
 
-    private Path path = new Path();
-
-    // VALIDAR SI DIBUJO
     private boolean dibujoRealizado = false;
+
+
+    private float escala = 1f;
+
+
+    private float offsetX = 0;
+    private float offsetY = 0;
+
+    private float lastX;
+    private float lastY;
+
+    private boolean moviendo = false;
+
+    private ScaleGestureDetector detectorZoom;
 
     public Lienzo(Context context) {
 
         super(context);
+
+        paint = new Paint();
 
         paint.setColor(Color.WHITE);
 
@@ -29,10 +44,54 @@ public class Lienzo extends View {
 
         paint.setAntiAlias(true);
 
-        // LINEAS SUAVES
         paint.setStrokeCap(Paint.Cap.ROUND);
 
         paint.setStrokeJoin(Paint.Join.ROUND);
+
+        path = new Path();
+
+        detectorZoom =
+                new ScaleGestureDetector(
+                        context,
+                        new ScaleGestureDetector.SimpleOnScaleGestureListener() {
+
+                            @Override
+                            public boolean onScale(ScaleGestureDetector detector) {
+
+                                float factor =
+                                        detector.getScaleFactor();
+
+                                float focusX =
+                                        detector.getFocusX();
+
+                                float focusY =
+                                        detector.getFocusY();
+
+                                offsetX =
+                                        focusX -
+                                                ((focusX - offsetX) * factor);
+
+                                offsetY =
+                                        focusY -
+                                                ((focusY - offsetY) * factor);
+
+                                escala *= factor;
+
+                                escala =
+                                        Math.max(
+                                                0.5f,
+                                                Math.min(
+                                                        escala,
+                                                        5f
+                                                )
+                                        );
+
+                                invalidate();
+
+                                return true;
+                            }
+                        }
+                );
     }
 
     @Override
@@ -40,28 +99,93 @@ public class Lienzo extends View {
 
         super.onDraw(canvas);
 
-        // FONDO NEGRO
+
         canvas.drawColor(Color.BLACK);
 
-        // DIBUJO
+        canvas.save();
+
+
+        canvas.translate(offsetX, offsetY);
+
+
+        canvas.scale(escala, escala);
+
+
         canvas.drawPath(path, paint);
+
+        canvas.restore();
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
-        float x = event.getX();
+        detectorZoom.onTouchEvent(event);
 
-        float y = event.getY();
+
+        if (event.getPointerCount() == 2) {
+
+            switch (event.getActionMasked()) {
+
+                case MotionEvent.ACTION_POINTER_DOWN:
+
+                    lastX =
+                            (event.getX(0) + event.getX(1)) / 2f;
+
+                    lastY =
+                            (event.getY(0) + event.getY(1)) / 2f;
+
+                    moviendo = true;
+
+                    break;
+
+                case MotionEvent.ACTION_MOVE:
+
+                    if (moviendo) {
+
+                        float x =
+                                (event.getX(0) + event.getX(1)) / 2f;
+
+                        float y =
+                                (event.getY(0) + event.getY(1)) / 2f;
+
+                        offsetX += x - lastX;
+                        offsetY += y - lastY;
+
+                        lastX = x;
+                        lastY = y;
+
+                        invalidate();
+                    }
+
+                    break;
+
+                case MotionEvent.ACTION_POINTER_UP:
+
+                    moviendo = false;
+
+                    break;
+            }
+
+            return true;
+        }
+
+
+
+        float x =
+                (event.getX() - offsetX) / escala;
+
+        float y =
+                (event.getY() - offsetY) / escala;
 
         switch (event.getAction()) {
 
             case MotionEvent.ACTION_DOWN:
 
-                // YA DIBUJO
                 dibujoRealizado = true;
 
                 path.moveTo(x, y);
+
+                invalidate();
 
                 return true;
 
@@ -69,15 +193,22 @@ public class Lienzo extends View {
 
                 path.lineTo(x, y);
 
-                break;
-        }
+                invalidate();
 
-        invalidate();
+                return true;
+
+            case MotionEvent.ACTION_UP:
+
+                invalidate();
+
+                return true;
+        }
 
         return true;
     }
 
-    // LIMPIAR
+
+
     public void limpiar() {
 
         path.reset();
@@ -87,7 +218,8 @@ public class Lienzo extends View {
         invalidate();
     }
 
-    // CAMBIAR COLOR
+
+
     public void cambiarColor(int color) {
 
         paint.setColor(color);
@@ -95,7 +227,8 @@ public class Lienzo extends View {
         invalidate();
     }
 
-    // CAMBIAR GROSOR
+
+
     public void cambiarGrosor(float grosor) {
 
         paint.setStrokeWidth(grosor);
@@ -103,9 +236,30 @@ public class Lienzo extends View {
         invalidate();
     }
 
-    // VALIDAR SI HAY DIBUJO
+
+
     public boolean hayDibujo() {
 
         return dibujoRealizado;
+    }
+
+
+
+    public void resetZoom() {
+
+        escala = 1f;
+
+        offsetX = 0;
+
+        offsetY = 0;
+
+        invalidate();
+    }
+
+
+
+    public float getEscala() {
+
+        return escala;
     }
 }
