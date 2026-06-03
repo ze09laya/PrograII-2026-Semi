@@ -2,26 +2,25 @@ package com.example.miprimerapp;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import java.io.File;
 import java.util.ArrayList;
 
 public class AdaptadorDibujos extends BaseAdapter {
 
     Context context;
-
     ArrayList<String> dibujos;
-
     DB db;
 
     public AdaptadorDibujos(
@@ -30,27 +29,22 @@ public class AdaptadorDibujos extends BaseAdapter {
     ) {
 
         this.context = context;
-
         this.dibujos = dibujos;
-
         db = new DB(context);
     }
 
     @Override
     public int getCount() {
-
         return dibujos.size();
     }
 
     @Override
     public Object getItem(int position) {
-
         return dibujos.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-
         return position;
     }
 
@@ -61,13 +55,12 @@ public class AdaptadorDibujos extends BaseAdapter {
             ViewGroup parent
     ) {
 
-        View vista =
-                LayoutInflater.from(context)
-                        .inflate(
-                                R.layout.item_dibujo,
-                                parent,
-                                false
-                        );
+        View vista = LayoutInflater.from(context)
+                .inflate(
+                        R.layout.item_dibujo,
+                        parent,
+                        false
+                );
 
         ImageView img =
                 vista.findViewById(R.id.imgDibujo);
@@ -87,12 +80,23 @@ public class AdaptadorDibujos extends BaseAdapter {
         File archivo =
                 new File(ruta);
 
-        // VALIDAR EXISTE
+
         if (archivo.exists()) {
 
-            img.setImageBitmap(
-                    BitmapFactory.decodeFile(ruta)
-            );
+            img.setImageDrawable(null);
+
+            BitmapFactory.Options opciones =
+                    new BitmapFactory.Options();
+
+            opciones.inMutable = true;
+
+            Bitmap bitmap =
+                    BitmapFactory.decodeFile(
+                            ruta,
+                            opciones
+                    );
+
+            img.setImageBitmap(bitmap);
 
         } else {
 
@@ -101,17 +105,17 @@ public class AdaptadorDibujos extends BaseAdapter {
             );
         }
 
-        // NOMBRE
+
         txtNombre.setText(
                 archivo.getName()
         );
 
-        // ELIMINAR
+
         btnEliminar.setOnClickListener(v -> {
 
             new AlertDialog.Builder(context)
 
-                    .setTitle("Eliminar")
+                    .setTitle("Eliminar dibujo")
 
                     .setMessage(
                             "¿Deseas eliminar este dibujo?"
@@ -123,19 +127,14 @@ public class AdaptadorDibujos extends BaseAdapter {
 
                                 try {
 
-                                    // BORRAR ARCHIVO
                                     if (archivo.exists()) {
-
                                         archivo.delete();
                                     }
 
-                                    // BORRAR SQLITE
                                     db.eliminarDibujo(ruta);
 
-                                    // BORRAR LISTA
                                     dibujos.remove(position);
 
-                                    // ACTUALIZAR
                                     notifyDataSetChanged();
 
                                     Toast.makeText(
@@ -163,108 +162,21 @@ public class AdaptadorDibujos extends BaseAdapter {
                     .show();
         });
 
-        // EDITAR
+
         btnEditar.setOnClickListener(v -> {
 
-            AlertDialog.Builder builder =
-                    new AlertDialog.Builder(context);
+            Intent intent =
+                    new Intent(
+                            context,
+                            DibujoActivity.class
+                    );
 
-            builder.setTitle("Editar nombre");
-
-            EditText txt =
-                    new EditText(context);
-
-            txt.setText(
-                    archivo.getName()
-                            .replace(".png", "")
+            intent.putExtra(
+                    "rutaEditar",
+                    ruta
             );
 
-            builder.setView(txt);
-
-            builder.setPositiveButton(
-                    "Guardar",
-                    (dialog, which) -> {
-
-                        try {
-
-                            String nuevo =
-                                    txt.getText()
-                                            .toString()
-                                            .trim();
-
-                            // VALIDAR
-                            if (nuevo.isEmpty()) {
-
-                                Toast.makeText(
-                                        context,
-                                        "Nombre vacío",
-                                        Toast.LENGTH_SHORT
-                                ).show();
-
-                                return;
-                            }
-
-                            File nuevoArchivo =
-                                    new File(
-                                            archivo.getParent(),
-                                            nuevo + ".png"
-                                    );
-
-                            // RENOMBRAR
-                            boolean renombrado =
-                                    archivo.renameTo(
-                                            nuevoArchivo
-                                    );
-
-                            if (renombrado) {
-
-                                // SQLITE
-                                db.eliminarDibujo(ruta);
-
-                                db.guardarDibujo(
-                                        nuevoArchivo.getAbsolutePath()
-                                );
-
-                                // ACTUALIZAR LISTA
-                                dibujos.set(
-                                        position,
-                                        nuevoArchivo.getAbsolutePath()
-                                );
-
-                                notifyDataSetChanged();
-
-                                Toast.makeText(
-                                        context,
-                                        "Nombre actualizado ✏",
-                                        Toast.LENGTH_SHORT
-                                ).show();
-
-                            } else {
-
-                                Toast.makeText(
-                                        context,
-                                        "No se pudo editar",
-                                        Toast.LENGTH_SHORT
-                                ).show();
-                            }
-
-                        } catch (Exception e) {
-
-                            Toast.makeText(
-                                    context,
-                                    "Error editando",
-                                    Toast.LENGTH_SHORT
-                            ).show();
-                        }
-                    }
-            );
-
-            builder.setNegativeButton(
-                    "Cancelar",
-                    null
-            );
-
-            builder.show();
+            context.startActivity(intent);
         });
 
         return vista;

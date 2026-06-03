@@ -8,15 +8,17 @@ import android.graphics.Path;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.graphics.Bitmap;
 
 public class Lienzo extends View {
 
     private Paint paint;
     private Path path;
 
+
     private boolean dibujoRealizado = false;
 
-
+    private Bitmap dibujoBase;
     private float escala = 1f;
 
 
@@ -28,6 +30,17 @@ public class Lienzo extends View {
 
     private boolean moviendo = false;
 
+
+    public void cargarImagen(Bitmap bitmap) {
+
+        dibujoBase = bitmap;
+
+        dibujoRealizado = true;
+
+        path = new Path();
+
+        invalidate();
+    }
     private ScaleGestureDetector detectorZoom;
 
     public Lienzo(Context context) {
@@ -110,6 +123,16 @@ public class Lienzo extends View {
 
         canvas.scale(escala, escala);
 
+
+        if (dibujoBase != null) {
+
+            canvas.drawBitmap(
+                    dibujoBase,
+                    0,
+                    0,
+                    null
+            );
+        }
 
         canvas.drawPath(path, paint);
 
@@ -211,9 +234,17 @@ public class Lienzo extends View {
 
     public void limpiar() {
 
-        path.reset();
+        path = new Path();
+
+        dibujoBase = null;
 
         dibujoRealizado = false;
+
+        escala = 1f;
+
+        offsetX = 0;
+
+        offsetY = 0;
 
         invalidate();
     }
@@ -240,9 +271,8 @@ public class Lienzo extends View {
 
     public boolean hayDibujo() {
 
-        return dibujoRealizado;
+        return dibujoRealizado || dibujoBase != null;
     }
-
 
 
     public void resetZoom() {

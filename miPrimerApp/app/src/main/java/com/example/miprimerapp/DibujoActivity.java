@@ -34,6 +34,7 @@ public class DibujoActivity extends Activity {
     int cantidadDibujos = 0;
 
     boolean guardando = false;
+    String rutaEditar = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +57,22 @@ public class DibujoActivity extends Activity {
 
         lienzo = new Lienzo(this);
         contenedor.addView(lienzo);
+
+
+        rutaEditar =
+                getIntent().getStringExtra("rutaEditar");
+
+        if (rutaEditar != null) {
+
+            Bitmap bitmap =
+                    android.graphics.BitmapFactory
+                            .decodeFile(rutaEditar);
+
+            if (bitmap != null) {
+
+                lienzo.cargarImagen(bitmap);
+            }
+        }
 
         actualizarDatos();
 
@@ -109,12 +126,19 @@ public class DibujoActivity extends Activity {
         actualizarNivel();
     }
 
+
     private void guardarDibujo() {
 
         try {
 
             if (!lienzo.hayDibujo()) {
-                Toast.makeText(this, "Dibuja algo primero 🎨", Toast.LENGTH_SHORT).show();
+
+                Toast.makeText(
+                        this,
+                        "Dibuja algo primero 🎨",
+                        Toast.LENGTH_SHORT
+                ).show();
+
                 return;
             }
 
@@ -126,43 +150,88 @@ public class DibujoActivity extends Activity {
                     Bitmap.Config.ARGB_8888
             );
 
-            android.graphics.Canvas canvas = new android.graphics.Canvas(bitmap);
+            android.graphics.Canvas canvas =
+                    new android.graphics.Canvas(bitmap);
+
             lienzo.draw(canvas);
 
-            File carpeta = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            File carpeta =
+                    getExternalFilesDir(
+                            Environment.DIRECTORY_PICTURES
+                    );
 
             if (carpeta == null) {
+
                 guardando = false;
                 return;
             }
 
-            if (!carpeta.exists()) carpeta.mkdirs();
+            if (!carpeta.exists()) {
+                carpeta.mkdirs();
+            }
 
-            File archivo = new File(carpeta,
-                    "dibujo_" + System.currentTimeMillis() + ".png");
+            File archivo;
 
-            FileOutputStream output = new FileOutputStream(archivo);
+            // EDITAR
+            if (rutaEditar != null) {
 
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, output);
+                archivo = new File(rutaEditar);
+
+            }
+            // NUEVO
+            else {
+
+                archivo = new File(
+                        carpeta,
+                        "dibujo_" +
+                                System.currentTimeMillis()
+                                + ".png"
+                );
+            }
+
+            FileOutputStream output =
+                    new FileOutputStream(archivo);
+
+            bitmap.compress(
+                    Bitmap.CompressFormat.PNG,
+                    100,
+                    output
+            );
 
             output.flush();
             output.close();
 
-            db.guardarDibujo(archivo.getAbsolutePath());
+            // SOLO INSERTAR EN SQLITE SI ES NUEVO
+            if (rutaEditar == null) {
+
+                db.guardarDibujo(
+                        archivo.getAbsolutePath()
+                );
+            }
 
             actualizarDatos();
 
-            lienzo.limpiar();
-
-            Toast.makeText(this, "Guardado 🎨", Toast.LENGTH_SHORT).show();
+            Toast.makeText(
+                    this,
+                    rutaEditar == null
+                            ? "Guardado 🎨"
+                            : "Dibujo actualizado ✏️",
+                    Toast.LENGTH_SHORT
+            ).show();
 
             guardando = false;
+
+            finish();
 
         } catch (Exception e) {
 
             guardando = false;
 
-            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(
+                    this,
+                    "Error: " + e.getMessage(),
+                    Toast.LENGTH_LONG
+            ).show();
         }
     }
 

@@ -7,7 +7,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.GridView;
-
+import android.content.Intent;
 import java.util.ArrayList;
 
 public class ListaDibujosActivity extends Activity {
@@ -37,20 +37,23 @@ public class ListaDibujosActivity extends Activity {
 
         db = new DB(this);
 
-        // GRID
+
         gridDibujos =
                 findViewById(R.id.gridDibujos);
 
-        // BUSCADOR
+
         txtBuscar =
                 findViewById(R.id.txtBuscar);
 
-        // CARGAR
+
         cargarDibujos();
 
-        // FILTRAR
+
         txtBuscar.addTextChangedListener(
                 new TextWatcher() {
+
+
+
 
                     @Override
                     public void beforeTextChanged(
@@ -83,7 +86,17 @@ public class ListaDibujosActivity extends Activity {
                     }
                 }
         );
+
+
+
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        cargarDibujos();
+    }
+
 
     private void cargarDibujos() {
 
@@ -94,13 +107,13 @@ public class ListaDibujosActivity extends Activity {
 
         while (cursor.moveToNext()) {
 
-            String ruta = cursor.getString(
-                    cursor.getColumnIndexOrThrow("rutaDibujo")
-            );
+            String ruta =
+                    cursor.getString(
+                            cursor.getColumnIndexOrThrow("rutaDibujo")
+                    );
 
             File archivo = new File(ruta);
 
-            // SOLO SI EXISTE
             if (archivo.exists()) {
 
                 dibujos.add(ruta);
@@ -114,8 +127,20 @@ public class ListaDibujosActivity extends Activity {
 
         cursor.close();
 
-        adaptador = new AdaptadorDibujos(this, dibujos);
-        gridDibujos.setAdapter(adaptador);
+        if (adaptador == null) {
+
+            adaptador =
+                    new AdaptadorDibujos(
+                            this,
+                            dibujos
+                    );
+
+            gridDibujos.setAdapter(adaptador);
+
+        } else {
+
+            adaptador.notifyDataSetChanged();
+        }
     }
 
     private void filtrar(String texto) {
