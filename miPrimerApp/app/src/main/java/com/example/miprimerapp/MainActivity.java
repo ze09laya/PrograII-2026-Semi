@@ -364,6 +364,35 @@ public class MainActivity extends Activity {
         }
     }
 
+
+    private void elegirFotoTomada() {
+
+        if (fotosTomadas.isEmpty()) {
+            mostrarMsg("No hay fotos guardadas");
+            return;
+        }
+
+        String[] rutas = fotosTomadas.toArray(new String[0]);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Fotos guardadas 📁");
+
+        builder.setItems(rutas, (dialog, which) -> {
+
+            String rutaSeleccionada = rutas[which];
+
+            urlFoto = rutaSeleccionada;
+
+            Bitmap bitmap = BitmapFactory.decodeFile(rutaSeleccionada);
+
+            imgFoto.setImageBitmap(bitmap);
+
+            mostrarMsg("Foto seleccionada ✔");
+        });
+
+        builder.show();
+    }
+
     private File crearArchivoFoto()
             throws Exception {
 
@@ -502,7 +531,9 @@ public class MainActivity extends Activity {
     }
 
     private void guardarProducto() {
+
         try {
+
             String codigo = txtCodigo.getText().toString().trim();
             String descripcion = txtDescripcion.getText().toString().trim();
             String marca = txtMarca.getText().toString().trim();
@@ -511,19 +542,19 @@ public class MainActivity extends Activity {
             String costoStr = txtCosto.getText().toString().trim();
             String stockStr = txtStock.getText().toString().trim();
 
-            if (descripcion.isEmpty()
-                    || marca.isEmpty()
-                    || presentacion.isEmpty()
-                    || precioStr.isEmpty()
-                    || costoStr.isEmpty()
-                    || stockStr.isEmpty()) {
+            if (descripcion.isEmpty() ||
+                    marca.isEmpty() ||
+                    presentacion.isEmpty() ||
+                    precioStr.isEmpty() ||
+                    costoStr.isEmpty() ||
+                    stockStr.isEmpty()) {
 
                 mostrarMsg("Complete todos los campos");
                 return;
             }
 
             if (urlFoto == null || urlFoto.isEmpty()) {
-                mostrarMsg("Selecciona una imagen 📸");
+                mostrarMsg("Seleccione una imagen");
                 return;
             }
 
@@ -533,17 +564,14 @@ public class MainActivity extends Activity {
 
             double ganancia;
 
-            // CORRECCIÓN 1: Manejo de Costo 0 (Día sin dificultades)
             if (costo > 0) {
                 ganancia = ((precio - costo) / costo) * 100;
-            } else if (precio > 0) {
-                // Si tuvo cosas buenas (precio) y 0 dificultades (costo), es un día excelente
-                ganancia = 100;
             } else {
-                ganancia = 0;
+                ganancia = 100;
             }
 
-            // ASIGNAR EMOCION
+            String emocion;
+
             if (ganancia >= 50) {
                 emocion = "😄";
             } else if (ganancia >= 20) {
@@ -552,7 +580,7 @@ public class MainActivity extends Activity {
                 emocion = "😢";
             }
 
-            if (idProducto.isEmpty()) {
+            if (idProducto == null || idProducto.isEmpty()) {
                 idProducto = generarId();
             }
 
@@ -570,11 +598,17 @@ public class MainActivity extends Activity {
                     emocion
             };
 
-            // CORRECCIÓN 2: Guardar en la base de datos local del teléfono SIEMPRE
-            db.administrar_amigos(accion, datos);
+            // GUARDAR EN SQLITE
+            String resultado = db.administrar_amigos(accion, datos);
 
-            // Preparamos el objeto JSON por si hay que enviarlo a la nube
+            if (!resultado.equals("ok")) {
+                mostrarMsg("Error SQLite: " + resultado);
+                return;
+            }
+
+            // PREPARAR JSON PARA LA NUBE
             JSONObject json = new JSONObject();
+
             json.put("idProducto", idProducto);
             json.put("codigo", codigo);
             json.put("descripcion", descripcion);
@@ -585,6 +619,7 @@ public class MainActivity extends Activity {
             json.put("costo", costo);
             json.put("stock", stock);
             json.put("ganancia", ganancia);
+            json.put("emocion", emocion);
 
             if (accion.equals("modificar")) {
                 json.put("_id", id);
@@ -593,69 +628,32 @@ public class MainActivity extends Activity {
 
             detectarinternet di = new detectarinternet(this);
 
+            // SI NO HAY INTERNET SOLO GUARDA LOCAL
             if (!di.hayConexionInternet()) {
-                // Si no hay internet, el flujo termina aquí ya habiendo guardado localmente
-                mostrarMsg("¡Guardado en el dispositivo! 🎉");
+
+                mostrarMsg("Guardado localmente ✔");
                 regresarLista();
                 return;
             }
 
-            // Si SÍ hay internet, además de haber guardado en el teléfono, lo sube al servidor
+            // SI HAY INTERNET TAMBIÉN SUBE A LA NUBE
             enviarDatosServidor enviar = new enviarDatosServidor(this);
+
             enviar.execute(
                     json.toString(),
                     "POST",
                     utilidades.url_mto
             );
 
-            mostrarMsg("¡Guardado y Sincronizado en la nube! 🚀");
+            mostrarMsg("Guardado local y sincronizado ✔");
             regresarLista();
 
         } catch (Exception e) {
+
             mostrarMsg("Error: " + e.getMessage());
+            e.printStackTrace();
+
         }
-    }
-
-    private void elegirFotoTomada() {
-
-        if (fotosTomadas.isEmpty()) {
-
-            mostrarMsg("No hay fotos 😢");
-
-            return;
-        }
-
-        String[] lista =
-                new String[fotosTomadas.size()];
-
-        for (int i = 0;
-             i < fotosTomadas.size();
-             i++) {
-
-            lista[i] =
-                    "Foto " + (i + 1);
-        }
-
-        new AlertDialog.Builder(this)
-
-                .setTitle(
-                        "Escoge una foto 📁"
-                )
-
-                .setItems(lista,
-                        (d, which) -> {
-
-                            urlFoto =
-                                    fotosTomadas.get(which);
-
-                            imgFoto.setImageBitmap(
-                                    BitmapFactory.decodeFile(
-                                            urlFoto
-                                    )
-                            );
-                        })
-
-                .show();
     }
 
     private void mostrarDatos() {
