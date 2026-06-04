@@ -76,8 +76,8 @@
                 android:focusable="false"
                 android:hint="Toca para elegir 😊"
                 android:padding="4dp"
-                android:textColor="#000000"
-                android:textColorHint="#999999"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#FFFFFF"
                 android:textSize="15sp" />
         </LinearLayout>
 
@@ -108,8 +108,8 @@
                 android:focusable="false"
                 android:hint="Escuela, juego, paseo..."
                 android:padding="4dp"
-                android:textColor="#000000"
-                android:textColorHint="#999999"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#FFFFFF"
                 android:textSize="15sp" />
         </LinearLayout>
 
@@ -142,8 +142,8 @@
                 android:hint="Toca para seleccionar 🌟"
                 android:minLines="3"
                 android:padding="4dp"
-                android:textColor="#000000"
-                android:textColorHint="#999999"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#FFFFFF"
                 android:textSize="15sp" />
         </LinearLayout>
 
@@ -374,8 +374,8 @@
                 android:focusable="false"
                 android:hint="Selecciona 🎈"
                 android:padding="4dp"
-                android:textColor="#000000"
-                android:textColorHint="#999999"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#FFFFFF"
                 android:textSize="15sp" />
         </LinearLayout>
 
