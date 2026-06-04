@@ -1,6 +1,7 @@
 package com.example.miprimerapp;
-
+import android.widget.Toast;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -8,19 +9,18 @@ import android.graphics.Path;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.graphics.Bitmap;
+
+import java.util.ArrayList;
 
 public class Lienzo extends View {
 
     private Paint paint;
-    private Path path;
-
 
     private boolean dibujoRealizado = false;
 
     private Bitmap dibujoBase;
-    private float escala = 1f;
 
+    private float escala = 1f;
 
     private float offsetX = 0;
     private float offsetY = 0;
@@ -30,17 +30,10 @@ public class Lienzo extends View {
 
     private boolean moviendo = false;
 
+    private ArrayList<Path> trazos = new ArrayList<>();
 
-    public void cargarImagen(Bitmap bitmap) {
+    private Path pathActual;
 
-        dibujoBase = bitmap;
-
-        dibujoRealizado = true;
-
-        path = new Path();
-
-        invalidate();
-    }
     private ScaleGestureDetector detectorZoom;
 
     public Lienzo(Context context) {
@@ -61,15 +54,15 @@ public class Lienzo extends View {
 
         paint.setStrokeJoin(Paint.Join.ROUND);
 
-        path = new Path();
-
         detectorZoom =
                 new ScaleGestureDetector(
                         context,
                         new ScaleGestureDetector.SimpleOnScaleGestureListener() {
 
                             @Override
-                            public boolean onScale(ScaleGestureDetector detector) {
+                            public boolean onScale(
+                                    ScaleGestureDetector detector
+                            ) {
 
                                 float factor =
                                         detector.getScaleFactor();
@@ -107,22 +100,48 @@ public class Lienzo extends View {
                 );
     }
 
+    public void cargarImagen(Bitmap bitmap) {
+
+        dibujoBase = bitmap;
+
+        dibujoRealizado = true;
+
+        trazos.clear();
+
+        invalidate();
+    }
+
+    public void deshacer() {
+
+        Toast.makeText(
+                getContext(),
+                "Trazos: " + trazos.size(),
+                Toast.LENGTH_SHORT
+        ).show();
+
+        if (!trazos.isEmpty()) {
+
+            trazos.remove(trazos.size() - 1);
+
+        } else if (dibujoBase != null) {
+
+            dibujoBase = null;
+        }
+
+        invalidate();
+    }
     @Override
     protected void onDraw(Canvas canvas) {
 
         super.onDraw(canvas);
 
-
         canvas.drawColor(Color.BLACK);
 
         canvas.save();
 
-
         canvas.translate(offsetX, offsetY);
 
-
         canvas.scale(escala, escala);
-
 
         if (dibujoBase != null) {
 
@@ -134,7 +153,13 @@ public class Lienzo extends View {
             );
         }
 
-        canvas.drawPath(path, paint);
+        for (Path p : trazos) {
+
+            canvas.drawPath(
+                    p,
+                    paint
+            );
+        }
 
         canvas.restore();
     }
@@ -144,7 +169,6 @@ public class Lienzo extends View {
 
         detectorZoom.onTouchEvent(event);
 
-
         if (event.getPointerCount() == 2) {
 
             switch (event.getActionMasked()) {
@@ -152,10 +176,12 @@ public class Lienzo extends View {
                 case MotionEvent.ACTION_POINTER_DOWN:
 
                     lastX =
-                            (event.getX(0) + event.getX(1)) / 2f;
+                            (event.getX(0) +
+                                    event.getX(1)) / 2f;
 
                     lastY =
-                            (event.getY(0) + event.getY(1)) / 2f;
+                            (event.getY(0) +
+                                    event.getY(1)) / 2f;
 
                     moviendo = true;
 
@@ -166,10 +192,12 @@ public class Lienzo extends View {
                     if (moviendo) {
 
                         float x =
-                                (event.getX(0) + event.getX(1)) / 2f;
+                                (event.getX(0) +
+                                        event.getX(1)) / 2f;
 
                         float y =
-                                (event.getY(0) + event.getY(1)) / 2f;
+                                (event.getY(0) +
+                                        event.getY(1)) / 2f;
 
                         offsetX += x - lastX;
                         offsetY += y - lastY;
@@ -192,8 +220,6 @@ public class Lienzo extends View {
             return true;
         }
 
-
-
         float x =
                 (event.getX() - offsetX) / escala;
 
@@ -206,7 +232,11 @@ public class Lienzo extends View {
 
                 dibujoRealizado = true;
 
-                path.moveTo(x, y);
+                pathActual = new Path();
+
+                pathActual.moveTo(x, y);
+
+                trazos.add(pathActual);
 
                 invalidate();
 
@@ -214,13 +244,18 @@ public class Lienzo extends View {
 
             case MotionEvent.ACTION_MOVE:
 
-                path.lineTo(x, y);
+                if (pathActual != null) {
 
-                invalidate();
+                    pathActual.lineTo(x, y);
+
+                    invalidate();
+                }
 
                 return true;
 
             case MotionEvent.ACTION_UP:
+
+                pathActual = null;
 
                 invalidate();
 
@@ -230,11 +265,9 @@ public class Lienzo extends View {
         return true;
     }
 
-
-
     public void limpiar() {
 
-        path = new Path();
+        trazos.clear();
 
         dibujoBase = null;
 
@@ -246,10 +279,10 @@ public class Lienzo extends View {
 
         offsetY = 0;
 
+        pathActual = null;
+
         invalidate();
     }
-
-
 
     public void cambiarColor(int color) {
 
@@ -258,8 +291,6 @@ public class Lienzo extends View {
         invalidate();
     }
 
-
-
     public void cambiarGrosor(float grosor) {
 
         paint.setStrokeWidth(grosor);
@@ -267,11 +298,10 @@ public class Lienzo extends View {
         invalidate();
     }
 
-
-
     public boolean hayDibujo() {
 
-        return dibujoRealizado || dibujoBase != null;
+        return dibujoBase != null ||
+                !trazos.isEmpty();
     }
 
 
@@ -285,8 +315,6 @@ public class Lienzo extends View {
 
         invalidate();
     }
-
-
 
     public float getEscala() {
 

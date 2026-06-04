@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="#1B1B1B">
 
-    <!-- BARRA DE BUSQUEDA -->
+
     <androidx.cardview.widget.CardView
         android:id="@+id/cardBuscar"
         android:layout_width="match_parent"
@@ -79,7 +79,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@android:drawable/ic_menu_sort_by_size"
-                    app:tint="#FF9800"/>
+                    app:tint="#7C3AED"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -115,7 +115,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@android:drawable/ic_menu_edit"
-                    app:tint="#FF9800"/>
+                    app:tint="#7C3AED"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -169,7 +169,7 @@
         android:layout_alignParentEnd="true"
         android:layout_margin="18dp"
         android:src="@android:drawable/ic_input_add"
-        app:backgroundTint="#FF9800"
+        app:backgroundTint="#7C3AED"
         app:tint="#FFFFFF"
         app:fabSize="normal"
         app:borderWidth="0dp"/>

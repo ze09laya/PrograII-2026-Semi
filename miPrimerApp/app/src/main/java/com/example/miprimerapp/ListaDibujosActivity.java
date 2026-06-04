@@ -48,6 +48,8 @@ public class ListaDibujosActivity extends Activity {
 
         cargarDibujos();
 
+        findViewById(R.id.btnCerrar)
+                .setOnClickListener(v -> finish());
 
         txtBuscar.addTextChangedListener(
                 new TextWatcher() {

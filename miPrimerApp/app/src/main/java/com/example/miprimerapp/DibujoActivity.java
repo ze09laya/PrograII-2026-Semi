@@ -75,10 +75,15 @@ public class DibujoActivity extends Activity {
         }
 
         actualizarDatos();
-
         btnLimpiar.setOnClickListener(v -> {
-            lienzo.limpiar();
-            Toast.makeText(this, "Lienzo limpiado 🧹", Toast.LENGTH_SHORT).show();
+
+            lienzo.deshacer();
+
+            Toast.makeText(
+                    this,
+                    "Último trazo eliminado \uD83E\uDDF9",
+                    Toast.LENGTH_SHORT
+            ).show();
         });
 
         btnSalir.setOnClickListener(v -> finish());
@@ -201,7 +206,7 @@ public class DibujoActivity extends Activity {
             output.flush();
             output.close();
 
-            // SOLO INSERTAR EN SQLITE SI ES NUEVO
+
             if (rutaEditar == null) {
 
                 db.guardarDibujo(
